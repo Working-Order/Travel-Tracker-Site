@@ -34,11 +34,106 @@
         <a href="" class="reload">Reload</a>
         <a class="dismiss">Close</a>
     </div>
+    <div id="update-banner" hidden>
+        <span>A new version is ready.</span>
+        <button type="button" id="update-reload">Reload</button>
+        <button type="button" id="update-dismiss" aria-label="Dismiss">&times;</button>
+    </div>
+
     <script src="_framework/blazor.webassembly.js"></script>
     <script>
-        if ('serviceWorker' in navigator && location.protocol === 'https:') {
-            navigator.serviceWorker.register('service-worker.js');
-        }
+        // Keeps an installed PWA current.
+        //
+        // The service worker already calls skipWaiting and clients.claim, so a
+        // new build takes over the moment it installs. That alone is not enough:
+        // the page you are looking at has already loaded the old WebAssembly, so
+        // without a reload you keep seeing the previous version until you delete
+        // and reinstall the app. This closes that gap.
+        (function () {
+            if (!('serviceWorker' in navigator) || location.protocol !== 'https:') {
+                return;
+            }
+
+            // An update that lands this soon after load is treated as part of
+            // starting the app, so it reloads silently. Later than this and the
+            // user is mid-task, where yanking the page away could lose whatever
+            // they were typing -- so they get asked instead.
+            const SILENT_RELOAD_WINDOW_MS = 12000;
+            const loadedAt = Date.now();
+
+            // Whether a worker was already in charge when this page loaded. On a
+            // first-ever install there is none, and the page is already running
+            // the assets that worker just cached, so there is nothing to reload.
+            const hadController = !!navigator.serviceWorker.controller;
+
+            let handled = false;
+
+            function reloadOnce() {
+                if (handled) {
+                    return;
+                }
+
+                handled = true;
+                window.location.reload();
+            }
+
+            function offerReload() {
+                if (handled) {
+                    return;
+                }
+
+                handled = true;
+
+                const banner = document.getElementById('update-banner');
+                if (!banner) {
+                    return;
+                }
+
+                banner.hidden = false;
+                document.getElementById('update-reload')
+                    .addEventListener('click', () => window.location.reload());
+                document.getElementById('update-dismiss')
+                    .addEventListener('click', () => { banner.hidden = true; });
+            }
+
+            navigator.serviceWorker.addEventListener('controllerchange', function () {
+                if (!hadController) {
+                    return;
+                }
+
+                if (Date.now() - loadedAt < SILENT_RELOAD_WINDOW_MS) {
+                    reloadOnce();
+                } else {
+                    offerReload();
+                }
+            });
+
+            navigator.serviceWorker.register('service-worker.js').then(function (registration) {
+                // Ask immediately rather than waiting for the browser's own
+                // once-a-day-ish check.
+                registration.update().catch(function () { });
+
+                // The important one for a home-screen app. iOS usually resumes
+                // an installed PWA rather than starting it cold, so a plain
+                // load handler can go days without firing. Checking whenever the
+                // app comes back to the foreground is what makes "next launch"
+                // actually mean the next launch.
+                document.addEventListener('visibilitychange', function () {
+                    if (document.visibilityState === 'visible') {
+                        registration.update().catch(function () { });
+                    }
+                });
+
+                // A worker that installed but did not take over -- shouldn't
+                // happen given skipWaiting, but if it ever does the app would
+                // sit on a stale build forever, so nudge it through.
+                if (registration.waiting && navigator.serviceWorker.controller) {
+                    registration.waiting.postMessage({ type: 'SKIP_WAITING' });
+                }
+            }).catch(function () {
+                // No offline support this session. The app still works online.
+            });
+        })();
     </script>
 </body>
 

@@ -1,10 +1,29 @@
 // Caution! Be sure you understand the caveats before publishing an application with
 // offline support. See https://aka.ms/blazor-offline-considerations
 
+// Build stamp, rewritten by tools/cli/publish-site.ps1 on every publish.
+//
+// This line exists to make the file's own bytes change each time. A browser
+// decides whether to install a new worker by byte-comparing service-worker.js
+// itself, and everything that actually changes between our builds lives in the
+// imported service-worker-assets.js. Without a stamp here, a publish can ship
+// entirely new assets behind a service worker the browser considers identical,
+// and the installed app never updates.
+const buildVersion = "20260811-213350-ad52789";
+
 self.importScripts('./service-worker-assets.js');
 self.addEventListener('install', event => event.waitUntil(onInstall(event)));
 self.addEventListener('activate', event => event.waitUntil(onActivate(event)));
 self.addEventListener('fetch', event => event.respondWith(onFetch(event)));
+
+// Escape hatch for a worker that installed but never took over. onInstall
+// already calls skipWaiting, so this should be unreachable -- but if a browser
+// ever leaves one waiting, the installed app would serve the old build forever.
+self.addEventListener('message', event => {
+    if (event.data && event.data.type === 'SKIP_WAITING') {
+        self.skipWaiting();
+    }
+});
 
 const cacheNamePrefix = 'offline-cache-';
 const cacheName = `${cacheNamePrefix}${self.assetsManifest.version}`;
@@ -56,4 +75,4 @@ async function onFetch(event) {
 
     return cachedResponse || fetch(event.request);
 }
-/* Manifest version: YwB5bL/9-1786480337 */
+/* Manifest version: eNXKYPA8-1786484031 */

@@ -719,3 +719,69 @@ button:disabled { opacity: 0.5; cursor: default; }
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
 }
+
+/* --- Update banner ---------------------------------------------------------
+   Shown only when a new build arrives mid-session. An update that lands while
+   the app is still starting reloads silently instead, so this should be a rare
+   sight. Sits above the tab bar so it never covers navigation. */
+
+#update-banner {
+    position: fixed;
+    left: 0.75rem;
+    right: 0.75rem;
+    bottom: calc(var(--nav-height) + var(--safe-bottom) + 0.75rem);
+    z-index: 40;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.7rem 0.85rem;
+    border-radius: var(--radius);
+    background: var(--blue-600);
+    color: #fff;
+    font-size: 0.9rem;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.22);
+}
+
+#update-banner[hidden] { display: none; }
+
+#update-banner span { flex: 1; }
+
+#update-banner button {
+    padding: 0.35rem 0.7rem;
+    border: 1px solid rgba(255, 255, 255, 0.55);
+    border-radius: 999px;
+    background: transparent;
+    color: #fff;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+#update-banner #update-dismiss {
+    padding: 0.2rem 0.5rem;
+    border-color: transparent;
+    font-size: 1.1rem;
+    line-height: 1;
+}
+
+@media (min-width: 640px) {
+    #update-banner {
+        left: 50%;
+        right: auto;
+        transform: translateX(-50%);
+        min-width: 320px;
+    }
+}
+
+/* Catalog rows in the card picker: a check-row that behaves like a button. */
+.card-pick {
+    width: 100%;
+    border: 0;
+    border-radius: var(--radius-sm);
+    background: transparent;
+    color: inherit;
+    text-align: left;
+    cursor: pointer;
+}
+
+.card-pick:hover { background: var(--surface-alt); }
