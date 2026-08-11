@@ -628,3 +628,94 @@ button:disabled { opacity: 0.5; cursor: default; }
     right: 0.75rem;
     cursor: pointer;
 }
+
+/* --- Planning expansion ----------------------------------------------------
+   Inline validation, suggestion chips, and the one-time recovery code. These
+   sit on top of the existing card/field vocabulary rather than replacing it. */
+
+.status-ok { color: var(--success); }
+
+.status-warn { color: var(--danger); }
+
+.chip-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+}
+
+.chip {
+    padding: 0.3rem 0.7rem;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: var(--surface-alt);
+    color: var(--text);
+    font-size: 0.85rem;
+    cursor: pointer;
+}
+
+.chip:hover { border-color: var(--blue-600); }
+
+/* Monospaced and selectable: the user has to copy this accurately, once. */
+.recovery-code {
+    padding: 0.75rem;
+    border: 1px dashed var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--surface-alt);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.95rem;
+    letter-spacing: 0.04em;
+    text-align: center;
+    word-break: break-all;
+    user-select: all;
+}
+
+/* --- Preparation dashboard -------------------------------------------------
+   Each card summarises a preparation area from the underlying records, so the
+   status dot has to read at a glance before any text is parsed. */
+
+.prep-card { display: block; }
+
+.prep-dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    margin-right: 0.45rem;
+    border-radius: 50%;
+    background: var(--text-faint);
+    vertical-align: middle;
+}
+
+.prep-dot-done { background: var(--success); }
+.prep-dot-warn { background: var(--danger); }
+.prep-dot-progress { background: var(--amber-400); }
+.prep-dot-na { background: var(--border); }
+
+.prep-details {
+    margin-top: 0.5rem;
+    padding-top: 0.5rem;
+    border-top: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    font-size: 0.85rem;
+}
+
+/* Six tabs rather than five. Tighten the label so "Calendar" and "Settings"
+   still fit on a 375px screen without truncating. */
+.tabbar a {
+    font-size: 0.62rem;
+    padding-left: 0.1rem;
+    padding-right: 0.1rem;
+}
+
+.tabbar svg {
+    width: 20px;
+    height: 20px;
+}
+
+/* Wide content -- planned-versus-actual tables in particular -- scrolls inside
+   itself. The page body must never scroll sideways. */
+.scroll-x {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
