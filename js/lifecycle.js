@@ -27,6 +27,37 @@ function onOnline() {
     notify("online");
 }
 
+// Publishes the sticky header's real height as --header-h.
+//
+// Anything that sticks below the header needs to know how tall it is, and that
+// varies: a subtitle adds a line, and inside a trip the section nav adds
+// another. Hardcoding an offset means the progress bar hides behind the header
+// on exactly the pages where it matters most, so it gets measured instead.
+let headerObserver = null;
+
+function watchHeader() {
+    const apply = () => {
+        const header = document.querySelector(".shell-header");
+        if (header) {
+            document.documentElement.style.setProperty(
+                "--header-h", `${Math.round(header.getBoundingClientRect().height)}px`);
+        }
+    };
+
+    apply();
+
+    if (typeof ResizeObserver === "undefined") {
+        return;
+    }
+
+    headerObserver = new ResizeObserver(apply);
+
+    // The header element is replaced on every navigation, so observe the shell
+    // and re-measure whenever anything inside it changes size.
+    const shell = document.querySelector(".shell") || document.body;
+    headerObserver.observe(shell);
+}
+
 export function register(dotNetRef) {
     // Re-registering replaces the old listener rather than stacking a second.
     unregister();
@@ -34,10 +65,17 @@ export function register(dotNetRef) {
     handler = dotNetRef;
     document.addEventListener("visibilitychange", onVisibilityChange);
     window.addEventListener("online", onOnline);
+    watchHeader();
 }
 
 export function unregister() {
     document.removeEventListener("visibilitychange", onVisibilityChange);
     window.removeEventListener("online", onOnline);
+
+    if (headerObserver) {
+        headerObserver.disconnect();
+        headerObserver = null;
+    }
+
     handler = null;
 }

@@ -785,3 +785,127 @@ button:disabled { opacity: 0.5; cursor: default; }
 }
 
 .card-pick:hover { background: var(--surface-alt); }
+
+/* --- Focus -----------------------------------------------------------------
+   Blazor's FocusOnNavigate moves focus to the <h1> on every navigation so screen
+   readers announce the new page. That is worth keeping, but it also drew a
+   visible ring around the title every time the app opened.
+
+   :focus-visible is the distinction the browser already makes between "focused"
+   and "focused by keyboard", so the ring goes for programmatic focus and stays
+   for anyone tabbing through. */
+
+h1:focus:not(:focus-visible),
+[tabindex="-1"]:focus:not(:focus-visible) {
+    outline: none;
+}
+
+/* --- Trip sub-navigation ---------------------------------------------------
+   Scoped to one trip and rendered inside the sticky header. Scrolls sideways
+   rather than wrapping: a second row would push every trip page's content down
+   the screen on a phone. */
+
+.trip-nav {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    margin: 0.6rem -1rem -0.75rem;
+    padding: 0 1rem 0.6rem;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+}
+
+.trip-nav::-webkit-scrollbar { display: none; }
+
+.trip-nav-name {
+    flex: none;
+    max-width: 9rem;
+    padding-right: 0.5rem;
+    margin-right: 0.15rem;
+    border-right: 1px solid var(--border);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 0.78rem;
+    font-weight: 650;
+    color: var(--text-dim);
+}
+
+.trip-nav a {
+    flex: none;
+    padding: 0.3rem 0.7rem;
+    border-radius: 999px;
+    background: var(--surface-alt);
+    color: var(--text-dim);
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.trip-nav a.active {
+    background: var(--blue-600);
+    color: #fff;
+}
+
+/* --- Sticky progress -------------------------------------------------------
+   Keeps the total in view while working down a long checklist. `top` clears the
+   sticky header, which is taller inside a trip because of the sub-nav. */
+
+.progress-sticky {
+    position: sticky;
+
+    /* --header-h is measured at runtime by js/lifecycle.js, because the header
+       is a different height on each page: a subtitle adds a line and the trip
+       section nav adds another. A hardcoded offset put this behind the header
+       on exactly the pages it matters on. The fallback covers the moment before
+       the first measurement lands. */
+    top: calc(var(--header-h, 7rem) + 0.4rem);
+    z-index: 15;
+    margin: -0.25rem -0.25rem 0.75rem;
+    padding: 0.7rem 0.85rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--surface);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+}
+
+/* --- Tab attention dot ------------------------------------------------------ */
+
+.tabbar a { position: relative; }
+
+.tab-dot {
+    position: absolute;
+    top: 0.55rem;
+    left: 50%;
+    margin-left: 0.45rem;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--danger);
+}
+
+/* --- Icon-only floating action button --------------------------------------- */
+
+.fab-round {
+    width: 56px;
+    height: 56px;
+    padding: 0;
+    justify-content: center;
+    font-size: 1.7rem;
+    line-height: 1;
+}
+
+/* Marks a checklist step that opens the record it is about. */
+.link-chevron {
+    color: var(--text-faint);
+    font-weight: 400;
+}
+
+a.check-row-title {
+    color: var(--text);
+    text-decoration: none;
+}
+
+a.check-row-title:hover { color: var(--blue-600); }
