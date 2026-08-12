@@ -228,6 +228,12 @@ a { color: var(--blue-600); }
     text-decoration: none;
 }
 
+/* The link from the cross-trip queue into one trip's full plan. It only takes
+   the accent when that trip is the only one, where the queue has nothing to
+   triage between and opening the plan is the point of the screen. */
+.plan-open-lead { border-color: var(--blue-600); }
+.plan-open-lead strong { color: var(--blue-600); }
+
 .card-head {
     display: flex;
     align-items: flex-start;
