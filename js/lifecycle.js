@@ -58,6 +58,70 @@ function watchHeader() {
     headerObserver.observe(shell);
 }
 
+// Keeps the trip section nav where the user left it.
+//
+// That nav sits inside the header, and the header is replaced on every
+// navigation for the reason above -- so each move between sections handed the
+// user a brand new scroll container parked back at Overview. Tapping a section
+// near the right-hand end, Flights or Calendar, scrolled the strip back to the
+// start under their finger.
+//
+// The offset is therefore held out here, where it outlives the element, and
+// reapplied to each new nav as it appears. Should the restored offset leave the
+// active chip out of sight -- opening a different trip, or arriving deep in the
+// list from a link -- that chip is centred instead, so the nav never opens on a
+// section the user cannot see.
+let tripNavScroll = 0;
+let tripNavObserver = null;
+
+function onTripNavScroll(event) {
+    tripNavScroll = event.currentTarget.scrollLeft;
+}
+
+function adoptTripNav() {
+    const nav = document.querySelector(".trip-nav");
+
+    // Already wired: Blazor kept the element across this render, and with it the
+    // scroll position, so there is nothing to restore.
+    if (!nav || nav.dataset.scrollBound === "true") {
+        return;
+    }
+
+    nav.dataset.scrollBound = "true";
+
+    // Assigning past the end clamps, and the assignment itself fires scroll,
+    // so tripNavScroll settles on the value actually reachable.
+    nav.scrollLeft = tripNavScroll;
+
+    const active = nav.querySelector("a.active");
+
+    if (active) {
+        const start = active.offsetLeft;
+        const end = start + active.offsetWidth;
+
+        if (start < nav.scrollLeft || end > nav.scrollLeft + nav.clientWidth) {
+            nav.scrollLeft = start - (nav.clientWidth - active.offsetWidth) / 2;
+        }
+    }
+
+    nav.addEventListener("scroll", onTripNavScroll, { passive: true });
+}
+
+function watchTripNav() {
+    adoptTripNav();
+
+    if (typeof MutationObserver === "undefined") {
+        return;
+    }
+
+    // Same reasoning as the header observer: watch the shell, because the nav
+    // itself is not the thing that survives.
+    tripNavObserver = new MutationObserver(adoptTripNav);
+
+    const shell = document.querySelector(".shell") || document.body;
+    tripNavObserver.observe(shell, { childList: true, subtree: true });
+}
+
 export function register(dotNetRef) {
     // Re-registering replaces the old listener rather than stacking a second.
     unregister();
@@ -66,6 +130,7 @@ export function register(dotNetRef) {
     document.addEventListener("visibilitychange", onVisibilityChange);
     window.addEventListener("online", onOnline);
     watchHeader();
+    watchTripNav();
 }
 
 export function unregister() {
@@ -75,6 +140,11 @@ export function unregister() {
     if (headerObserver) {
         headerObserver.disconnect();
         headerObserver = null;
+    }
+
+    if (tripNavObserver) {
+        tripNavObserver.disconnect();
+        tripNavObserver = null;
     }
 
     handler = null;

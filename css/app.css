@@ -565,10 +565,13 @@ button:disabled { opacity: 0.5; cursor: default; }
 
 /* --- Banners -------------------------------------------------------------- */
 
+/* Deliberately not a flex container. Banners are sentences, and most of them
+   carry inline markup -- a <a href="settings">, an <em>, a <strong>. Under
+   flex, every one of those becomes its own flex item and each run of bare text
+   between them becomes an anonymous one, so a single sentence was laid out as
+   three side-by-side columns that read in the wrong order. As a block the
+   inline content simply wraps as prose, which is all these ever needed. */
 .banner {
-    display: flex;
-    align-items: flex-start;
-    gap: 0.6rem;
     padding: 0.7rem 0.85rem;
     margin-bottom: 0.85rem;
     border-radius: var(--radius-sm);
@@ -794,14 +797,25 @@ button:disabled { opacity: 0.5; cursor: default; }
 
 /* --- Focus -----------------------------------------------------------------
    Blazor's FocusOnNavigate moves focus to the <h1> on every navigation so screen
-   readers announce the new page. That is worth keeping, but it also drew a
-   visible ring around the title every time the app opened.
+   readers announce the new page. That is worth keeping, but it also draws a ring
+   around the title of every page.
 
-   :focus-visible is the distinction the browser already makes between "focused"
-   and "focused by keyboard", so the ring goes for programmatic focus and stays
-   for anyone tabbing through. */
+   :focus-visible was meant to sort that out -- ring for keyboard users, none for
+   programmatic focus -- but WebKit treats a scripted .focus() on a non-form
+   element as focus-visible, so iOS kept drawing a blue ring around every title
+   while other browsers did not. A heading is not an interactive control; there
+   is nothing to operate once it holds focus, and nothing for a sighted keyboard
+   user to act on. So its ring goes unconditionally. Focus still moves, so the
+   screen-reader announcement is unaffected.
 
-h1:focus:not(:focus-visible),
+   Everything genuinely operable keeps its ring through the rule below. */
+
+h1:focus,
+h1:focus-visible {
+    outline: none;
+    box-shadow: none;
+}
+
 [tabindex="-1"]:focus:not(:focus-visible) {
     outline: none;
 }
