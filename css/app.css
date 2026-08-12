@@ -235,9 +235,32 @@ a { color: var(--blue-600); }
     white-space: nowrap;
 }
 
-/* The trailing "N more · Open the full plan" row inside an Up-next card. It is
-   a link, not a step, so no checkbox and the link colour instead of text. */
+/* The trailing "Open the full plan" row inside an Up-next card. It is a link,
+   not a step, so no checkbox and the link colour instead of text. */
 .more-link .check-row-title { color: var(--blue-600); }
+
+/* The caret that expands a trip's urgent items on Up next. It lives inside the
+   card's link, so it cancels the navigation itself; sized for a thumb even
+   though the glyph is small. */
+.brief-caret {
+    flex: none;
+    width: 2.2rem;
+    height: 2.2rem;
+    margin: -0.55rem -0.55rem -0.55rem 0;
+    border: 0;
+    background: transparent;
+    color: var(--blue-600);
+    font-size: 1rem;
+    line-height: 1;
+    cursor: pointer;
+    transition: transform 0.15s ease;
+}
+
+.brief-caret.open { transform: rotate(180deg); }
+
+/* The expanded items sit visually under their trip card. */
+.trip-brief { margin-bottom: 0.5rem; }
+.trip-brief-drop { margin-top: -0.35rem; }
 
 .card-head {
     display: flex;
