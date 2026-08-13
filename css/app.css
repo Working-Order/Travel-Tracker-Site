@@ -945,6 +945,77 @@ h1:focus-visible {
     line-height: 1;
 }
 
+/* --- Budget breakdown -------------------------------------------------------
+   A category is a stacked row rather than a table cell. The old table needed
+   five columns and 30rem of width, so on a phone it scrolled sideways inside a
+   card that already scrolled down -- two axes to read one number. */
+
+.cat-row {
+    padding: 0.55rem 0;
+    border-bottom: 1px solid var(--border);
+}
+
+.cat-row:last-child { border-bottom: none; }
+
+.cat-name { font-size: 0.9rem; font-weight: 600; }
+
+/* Amounts never wrap: a figure broken across two lines stops being a figure. */
+.cat-figures { font-size: 0.9rem; white-space: nowrap; }
+
+.cat-figures .faint { font-size: 0.8rem; }
+
+.cat-bar { margin-top: 0.4rem; }
+
+.cat-sub { margin-top: 0.25rem; }
+
+/* Separates the locked-in budget from the revision underneath it. */
+.budget-block {
+    margin-top: 0.75rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid var(--border);
+}
+
+/* --- Collapsible cost groups ------------------------------------------------
+   The header is a button so it is reachable by keyboard and announces its
+   expanded state, but it has to read as a list row, hence the reset. */
+
+.group-head {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    width: 100%;
+    padding: 0.6rem 0;
+    border: 0;
+    border-bottom: 1px solid var(--border);
+    border-radius: 0;
+    background: transparent;
+    color: inherit;
+    font-weight: 400;
+    text-align: left;
+}
+
+.group-caret {
+    flex: none;
+    width: 1rem;
+    color: var(--text-faint);
+    font-size: 0.8rem;
+    transition: transform 0.15s ease;
+}
+
+.group-caret.open { transform: rotate(90deg); }
+
+.group-body {
+    padding: 0 0 0.35rem 1.5rem;
+    border-bottom: 1px solid var(--border);
+}
+
+.card-tight > div:last-child > .group-head,
+.card-tight > div:last-child > .group-body { border-bottom: none; }
+
+@media (prefers-reduced-motion: reduce) {
+    .group-caret { transition: none; }
+}
+
 /* Marks a checklist step that opens the record it is about. */
 .link-chevron {
     color: var(--text-faint);
