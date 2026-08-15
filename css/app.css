@@ -1027,4 +1027,315 @@ a.check-row-title {
     text-decoration: none;
 }
 
+/* --- Card grids --------------------------------------------------------------
+   A run of cards is one column on a phone and as many columns as fit once the
+   window is wide. Spacing comes from the grid gap, so a card inside a grid drops
+   the bottom margin it carries when it stands in the normal flow -- otherwise
+   the two stack up and the rows drift apart.
+
+   align-items: start keeps a card the height of its own contents. Stretching
+   every card in a row to match the tallest one is what makes a grid of forms
+   look like a spreadsheet. */
+
+.card-grid {
+    display: grid;
+    gap: 0.85rem;
+    align-items: start;
+    margin-bottom: 0.85rem;
+}
+
+.card-grid > .card,
+.card-grid > * > .card:last-child {
+    margin-bottom: 0;
+}
+
+/* A grid with nothing in it -- no visas recorded, nothing packed yet -- must
+   not leave its own gap behind. */
+.card-grid:empty {
+    display: none;
+}
+
+/* A jump from the side menu has to clear the sticky header, whose height is
+   measured at runtime -- see --header-h above. */
+.section-title {
+    scroll-margin-top: calc(var(--header-h, 7rem) + 1rem);
+}
+
+/* --- Desktop side menu -------------------------------------------------------
+   Hidden until the window can spare a column for it, at which point the bottom
+   tab bar and the trip strip both go away and this replaces them.
+
+   The phone layout is a single centred column, which is right for a phone and
+   wrong for a 1080p window: the app read as a narrow strip of content with a
+   third of the screen empty either side. Moving navigation out of the content
+   column and letting the pages lay their cards out in rows is what fills that
+   space with something worth looking at, rather than just stretching a form
+   field to 1600px. */
+
+.sidenav {
+    display: none;
+}
+
+@media (min-width: 1024px) {
+    :root {
+        --rail: 264px;
+
+        /* Wide enough for three columns of cards, capped so a paragraph never
+           runs to a line length nobody can track back from. */
+        --content: 1180px;
+    }
+
+    .shell {
+        display: grid;
+        grid-template-columns: var(--rail) minmax(0, 1fr);
+    }
+
+    /* height + align-self, not stretch: a grid item stretched to the row's
+       height has nothing left to scroll past, and sticky would never engage. */
+    .sidenav {
+        display: flex;
+        position: sticky;
+        top: 0;
+        align-self: start;
+        flex-direction: column;
+        gap: 1.05rem;
+        height: 100vh;
+        height: 100dvh;
+        padding: 1.1rem 0.8rem 0.9rem;
+        overflow-y: auto;
+        background: var(--surface);
+        border-right: 1px solid var(--border);
+    }
+
+    .shell-main {
+        min-width: 0;
+    }
+
+    .tabbar,
+    .trip-nav {
+        display: none;
+    }
+
+    /* The header spans the column so its underline reaches both edges, but its
+       text lines up with the body's, which is why the padding sits on the rows
+       rather than on the header itself. */
+    .shell-header {
+        padding: 1.2rem 0 1rem;
+    }
+
+    .shell-header-row,
+    .shell-subtitle {
+        width: 100%;
+        max-width: var(--content);
+        margin-inline: auto;
+        padding-inline: 2rem;
+    }
+
+    .shell-header h1 {
+        font-size: 1.6rem;
+    }
+
+    .shell-body {
+        max-width: var(--content);
+        padding: 1.5rem 2rem 3.5rem;
+    }
+
+    .card-grid {
+        grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+        gap: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    /* Checklists need more width than a summary card: a step's title, its
+       category and its due date sit on one line, and squeezing them into a
+       third of the window wraps every row. Two columns, not three. */
+    .card-grid-wide {
+        grid-template-columns: repeat(auto-fill, minmax(430px, 1fr));
+    }
+
+    /* A form inside a card that now spans the content column. Two columns of
+       fields read better than one field stretched across all of it, and the
+       labels stay next to the inputs they name. */
+    .field-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        column-gap: 1rem;
+    }
+
+    /* Nothing floats over a tab bar that is no longer there. */
+    .fab {
+        right: 2rem;
+        bottom: 2rem;
+    }
+
+    #update-banner {
+        bottom: 1.5rem;
+    }
+}
+
+.sidenav-brand {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    padding: 0.2rem 0.6rem 0.1rem;
+    color: var(--text);
+    font-size: 1rem;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.sidenav-brand svg {
+    width: 22px;
+    height: 22px;
+    flex: none;
+    color: var(--blue-600);
+}
+
+.sidenav-primary {
+    display: flex;
+    flex-direction: column;
+    gap: 0.12rem;
+}
+
+.sidenav-primary a {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    padding: 0.55rem 0.65rem;
+    border-radius: var(--radius-sm);
+    color: var(--text-dim);
+    font-size: 0.92rem;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.sidenav-primary a:hover {
+    background: var(--surface-alt);
+    color: var(--text);
+}
+
+.sidenav-primary a.active {
+    background: var(--blue-50);
+    color: var(--blue-600);
+}
+
+.sidenav-primary svg {
+    width: 20px;
+    height: 20px;
+    flex: none;
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 1.9;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.sidenav-label {
+    flex: 1;
+    min-width: 0;
+}
+
+/* The rail has room for the number itself, so it says how much is waiting
+   rather than only that something is. */
+.sidenav-count {
+    flex: none;
+    min-width: 1.3rem;
+    padding: 0 0.35rem;
+    border-radius: 999px;
+    background: var(--danger);
+    color: #fff;
+    font-size: 0.7rem;
+    font-weight: 700;
+    line-height: 1.3rem;
+    text-align: center;
+}
+
+.sidenav-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    padding-top: 0.95rem;
+    border-top: 1px solid var(--border);
+}
+
+.sidenav-heading {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.5rem;
+    padding: 0 0.65rem 0.15rem;
+    color: var(--text-faint);
+    font-size: 0.71rem;
+    font-weight: 700;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+}
+
+.sidenav-links {
+    display: flex;
+    flex-direction: column;
+    gap: 0.05rem;
+}
+
+.sidenav-links a {
+    display: block;
+    padding: 0.4rem 0.65rem;
+    border-radius: var(--radius-sm);
+    color: var(--text-dim);
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-decoration: none;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.sidenav-links a:hover {
+    background: var(--surface-alt);
+    color: var(--text);
+}
+
+.sidenav-links a.active {
+    background: var(--blue-50);
+    color: var(--blue-600);
+}
+
+.sidenav-trip {
+    display: flex;
+    flex-direction: column;
+    gap: 0.05rem;
+    padding-top: 0.35rem;
+    padding-bottom: 0.35rem;
+}
+
+.sidenav-trip-when {
+    color: var(--text-faint);
+    font-size: 0.74rem;
+    font-weight: 500;
+}
+
+.sidenav-empty {
+    padding: 0 0.65rem;
+    color: var(--text-faint);
+    font-size: 0.85rem;
+}
+
+/* Pushed to the bottom of the rail: it is context, not a destination. */
+.sidenav-foot {
+    display: flex;
+    margin-top: auto;
+    padding: 0.8rem 0.65rem 0;
+    border-top: 1px solid var(--border);
+    color: var(--text-faint);
+    font-size: 0.8rem;
+}
+
+/* A card that opens something says so under the pointer. There is no hover on a
+   phone, and :hover on a touch device sticks after a tap, hence the query. */
+@media (hover: hover) and (min-width: 1024px) {
+    .card-link:hover {
+        border-color: var(--blue-600);
+    }
+}
+
 a.check-row-title:hover { color: var(--blue-600); }

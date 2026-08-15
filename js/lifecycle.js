@@ -122,6 +122,23 @@ function watchTripNav() {
     tripNavObserver.observe(shell, { childList: true, subtree: true });
 }
 
+// Jumps to a section from the desktop side menu.
+//
+// The menu could have used a plain fragment link, but the header is sticky and
+// its height changes per page, so the browser's own jump lands the heading
+// underneath it. scrollIntoView honours the scroll-margin the stylesheet sets
+// from the measured --header-h, which puts the heading where it can be read.
+export function scrollToSection(id) {
+    const target = document.getElementById(id);
+
+    if (!target) {
+        return;
+    }
+
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    target.scrollIntoView({ behavior: reduced ? "auto" : "smooth", block: "start" });
+}
+
 export function register(dotNetRef) {
     // Re-registering replaces the old listener rather than stacking a second.
     unregister();
