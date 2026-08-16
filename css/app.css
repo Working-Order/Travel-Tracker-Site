@@ -1541,6 +1541,14 @@ a.check-row-title:hover { color: var(--blue-600); }
     font-weight: 650;
 }
 
+/* The budget option currently under discussion: the numbers at the top of the
+   screen describe this one, so it says so rather than leaving the reader to
+   match a total against a card. */
+.option-active {
+    border-color: var(--blue-600);
+    box-shadow: inset 3px 0 0 var(--blue-600);
+}
+
 /* A count on a tab, for history entries still standing. */
 .tab-count {
     display: inline-block;
