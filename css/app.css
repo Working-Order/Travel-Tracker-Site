@@ -1534,13 +1534,70 @@ a.check-row-title:hover { color: var(--blue-600); }
     font-weight: 650;
 }
 
-/* The budget option currently under discussion: the numbers at the top of the
-   screen describe this one, so it says so rather than leaving the reader to
-   match a total against a card. */
-.option-active {
-    border-color: var(--blue-600);
-    box-shadow: inset 3px 0 0 var(--blue-600);
+/* --- The budgets on the table -----------------------------------------------
+   A list, not a grid of cards. Cards made each budget recite its whole contents
+   at once, so comparing two of them meant reading two paragraphs; rows put the
+   names under one another and the totals in a column, and hold the breakdown
+   behind a caret until it is wanted. */
+
+.budget-item { border-bottom: 1px solid var(--border); }
+
+.card-tight > .budget-item:last-child { border-bottom: none; }
+
+.budget-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
 }
+
+/* The whole left of the row opens it. A button, so it is reachable by keyboard
+   and announces whether it is open, reset so it still reads as a list row
+   rather than as a control. */
+.budget-row-head {
+    display: flex;
+    flex: 1;
+    align-items: center;
+    gap: 0.5rem;
+    min-width: 0;
+    padding: 0.6rem 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    color: inherit;
+    font-weight: 400;
+    text-align: left;
+}
+
+.budget-row-main { flex: 1; min-width: 0; }
+
+.budget-row-name {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+}
+
+.budget-row-sub { display: block; margin-top: 0.15rem; }
+
+.budget-row-head .cat-figures { flex: none; }
+
+.budget-row-action {
+    flex: none;
+    text-align: right;
+}
+
+/* Reserved whether or not this row is the one carrying the button, so the
+   totals stay in a column instead of stepping in and out by its width. Not on a
+   phone: there the column is too narrow to spend on a gap. */
+@media (min-width: 640px) {
+    .budget-row-action { min-width: 9rem; }
+}
+
+/* Indented past the caret, so the breakdown reads as belonging to the row above
+   it rather than as the next row down. */
+.budget-detail { padding: 0 0 0.6rem 1.5rem; }
+
+.budget-line { padding: 0.15rem 0; }
 
 /* A count on a tab, for history entries still standing. */
 .tab-count {
