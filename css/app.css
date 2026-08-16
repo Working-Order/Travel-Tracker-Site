@@ -1350,6 +1350,15 @@ a.check-row-title:hover { color: var(--blue-600); }
    phone the bubble lands squarely on top of the Send key. */
 .chat-bubble.open { display: none; }
 
+/* A trip screen with its own action button -- add a cost, add an event, add a
+   step -- now has two round buttons wanting the same corner, and they were
+   landing on each other. The page's own button moves up, because it belongs to
+   the page and the bubble belongs to the trip: the constant thing should keep
+   the constant position. */
+.shell:has(.chat-bubble) .fab {
+    bottom: calc(var(--nav-height) + var(--safe-bottom) + 5.25rem);
+}
+
 .chat-bubble {
     position: fixed;
     right: 1rem;
@@ -1532,6 +1541,52 @@ a.check-row-title:hover { color: var(--blue-600); }
     font-weight: 650;
 }
 
+/* A count on a tab, for history entries still standing. */
+.tab-count {
+    display: inline-block;
+    min-width: 1.1rem;
+    margin-left: 0.3rem;
+    padding: 0 0.28rem;
+    border-radius: 999px;
+    background: var(--surface-alt);
+    color: var(--text-dim);
+    font-size: 0.68rem;
+    line-height: 1.1rem;
+    text-align: center;
+}
+
+.chat-tabs button.active .tab-count {
+    background: var(--blue-600);
+    color: #fff;
+}
+
+/* --- What it changed ------------------------------------------------------ */
+
+.history-changes {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    margin-top: 0.5rem;
+    padding-top: 0.45rem;
+    border-top: 1px solid var(--border);
+}
+
+.history-change {
+    display: flex;
+    align-items: baseline;
+    gap: 0.4rem;
+}
+
+/* An undone batch stays in the list -- it is how you redo it -- but stops
+   claiming to be part of the trip. */
+.history-undone {
+    opacity: 0.62;
+}
+
+.history-undone .card-head h3 {
+    text-decoration: line-through;
+}
+
 /* A chat in the history list: a card-sized button that keeps the row layout. */
 .chat-row {
     display: block;
@@ -1669,6 +1724,11 @@ a.check-row-title:hover { color: var(--blue-600); }
     .chat-bubble {
         right: 1.25rem;
         bottom: 1.25rem;
+    }
+
+    .shell:has(.chat-bubble) .fab {
+        right: 1.25rem;
+        bottom: 5.5rem;
     }
 
     .msg { max-width: 92%; }

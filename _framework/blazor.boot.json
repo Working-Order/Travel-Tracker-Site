@@ -1,7 +1,7 @@
 {
   "mainAssemblyName": "TravelTracker.Mobile",
   "resources": {
-    "hash": "sha256-bNfDtF2HQl3dmw5aC1EXceOzhEoL3hv9Kmi+zxv6DJw=",
+    "hash": "sha256-4b7IozKztiCHpDWJwT8HaUuNhgEIqjKPbohHRPzNPXE=",
     "jsModuleNative": {
       "dotnet.native.8.0.23.fp7960u1ej.js": "sha256-NljIbpK/1KCj0+knpX8U77Rbl5kTtfFIuFjK7AuczEw="
     },
@@ -46,17 +46,17 @@
       "System.Net.Http.wasm": "sha256-XWIlHRVck2VaGU7Qy1XvdPznJVMmNj+/ecKW5sZnZOw=",
       "System.Net.Primitives.wasm": "sha256-hVk56QYNdPGfW/epv0EvBp4f5Uo18d63kaykia6e13E=",
       "System.ObjectModel.wasm": "sha256-M+oCU0GYjM1TScvJPK4NEI8LviF/vObyrI1/LWpYXdI=",
-      "System.Private.CoreLib.wasm": "sha256-QOEZqtGLG+vxl5zRbYV56nNHs2G2Y4WSwxli0e5XIQA=",
+      "System.Private.CoreLib.wasm": "sha256-cLvzHnC+EY2XOcAGIhtBeRwIjUE/eIsCu/dFj5Uv+VE=",
       "System.Private.Uri.wasm": "sha256-abQBNHcgehlzNfJoSIZIIUCSZ+YWJZFLQeHgE8wqvpU=",
       "System.Runtime.InteropServices.JavaScript.wasm": "sha256-k7vJ1MR/kDaJmu+pERFoVEedwgfs3jPlaK8t/RLQ/AE=",
-      "System.Runtime.wasm": "sha256-qw6Bbwurcsdvq27Sg9Mlwl8fYg/tQ4AaAiB3nrhXZwI=",
+      "System.Runtime.wasm": "sha256-+HBnma7pVFj4ASvsRE9XZ9CUtGQIDBIA9eJLurXT+4g=",
       "System.Text.Encodings.Web.wasm": "sha256-J1wJ+AoL1KVOaLn2okP/wgISUPdnvwa5i7SUmMJcACk=",
-      "System.Text.Json.wasm": "sha256-t+/Zblfx7W0b00Q8tZQJnE3aokdvZo2dmSAodF5AAt0=",
+      "System.Text.Json.wasm": "sha256-eYDBLWfJQmsaqIFmT0SxlkkOqjzrbk29yGPyHu2O86M=",
       "System.Text.RegularExpressions.wasm": "sha256-TH9NbQZf85Ehx3D+ZZkJBprnUSKBHUA22PD/xIEIFek=",
       "System.Threading.wasm": "sha256-ZBXLPz+TmsaIiwImi/RaEv3rTNGy7bRGO+5nvLJJuYU=",
       "System.wasm": "sha256-tF8W2YKc8aZCr0Ve8H9C2Pn58tjopgQpqHl/hJ3Ygi4=",
-      "TravelTracker.Core.wasm": "sha256-tt3YwaO5V/TEo/tys+nbXVD9y4/PwKi7ZBJw+sC3aSk=",
-      "TravelTracker.Mobile.wasm": "sha256-Uwq9SWO2fZG+sWE+oUdszkf1kjIllcar1NCSd3lVN4E="
+      "TravelTracker.Core.wasm": "sha256-t1K3N5Ydec/TxIDU1vBN0tuRewEJNg2syhgm7rOMyYI=",
+      "TravelTracker.Mobile.wasm": "sha256-ShVxFtoCrkDoWSXW86bcLru2k+YU8C/SFfqF8iPCrkQ="
     }
   },
   "cacheBootResources": true,
