@@ -1339,3 +1339,96 @@ a.check-row-title {
 }
 
 a.check-row-title:hover { color: var(--blue-600); }
+
+/* --- Trip assistant ----------------------------------------------------------
+   A conversation reads as a column of turns, not as a list of cards: the user's
+   questions sit right and tight, the answers sit left and open. The suggestion
+   rows inside an answer deliberately reuse the check-row vocabulary from the
+   plan and packing screens, because that is exactly what they become. */
+
+.chat-page {
+    display: flex;
+    flex-direction: column;
+}
+
+.msg {
+    max-width: 85%;
+    margin-bottom: 0.75rem;
+    padding: 0.7rem 0.85rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--surface);
+}
+
+.msg-user {
+    align-self: flex-end;
+    border-color: transparent;
+    background: var(--blue-50);
+}
+
+.msg-bot {
+    align-self: flex-start;
+}
+
+.msg-meta {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 0.3rem;
+    color: var(--text-faint);
+    font-size: 0.72rem;
+    font-weight: 600;
+}
+
+/* Answers arrive with their own line breaks, and a paragraph the model meant as
+   two is not one. Long place names and URLs wrap rather than widen the page. */
+.msg-text {
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
+
+.msg-picks {
+    margin-top: 0.6rem;
+    padding-top: 0.35rem;
+    border-top: 1px solid var(--border);
+}
+
+/* Stays within reach while the thread scrolls behind it. It clears the tab bar
+   on a phone, and sits at the foot of the content column on a desktop, where
+   there is no tab bar to clear. */
+.composer {
+    position: sticky;
+    bottom: calc(var(--nav-height) + var(--safe-bottom));
+    z-index: 10;
+    display: flex;
+    align-items: flex-end;
+    gap: 0.5rem;
+    margin-top: 0.25rem;
+    padding: 0.6rem 0;
+    background: var(--bg);
+}
+
+.composer textarea {
+    flex: 1;
+    min-width: 0;
+    margin: 0;
+    resize: none;
+}
+
+.composer button {
+    flex: none;
+}
+
+@media (min-width: 1024px) {
+    .chat-page {
+        max-width: 900px;
+    }
+
+    .msg {
+        max-width: 78%;
+    }
+
+    .composer {
+        bottom: 0;
+        padding-bottom: 1rem;
+    }
+}
