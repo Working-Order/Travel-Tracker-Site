@@ -1534,70 +1534,13 @@ a.check-row-title:hover { color: var(--blue-600); }
     font-weight: 650;
 }
 
-/* --- The budgets on the table -----------------------------------------------
-   A list, not a grid of cards. Cards made each budget recite its whole contents
-   at once, so comparing two of them meant reading two paragraphs; rows put the
-   names under one another and the totals in a column, and hold the breakdown
-   behind a caret until it is wanted. */
-
-.budget-item { border-bottom: 1px solid var(--border); }
-
-.card-tight > .budget-item:last-child { border-bottom: none; }
-
-.budget-row {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
+/* The budget option currently under discussion: the numbers at the top of the
+   screen describe this one, so it says so rather than leaving the reader to
+   match a total against a card. */
+.option-active {
+    border-color: var(--blue-600);
+    box-shadow: inset 3px 0 0 var(--blue-600);
 }
-
-/* The whole left of the row opens it. A button, so it is reachable by keyboard
-   and announces whether it is open, reset so it still reads as a list row
-   rather than as a control. */
-.budget-row-head {
-    display: flex;
-    flex: 1;
-    align-items: center;
-    gap: 0.5rem;
-    min-width: 0;
-    padding: 0.6rem 0;
-    border: 0;
-    border-radius: 0;
-    background: transparent;
-    color: inherit;
-    font-weight: 400;
-    text-align: left;
-}
-
-.budget-row-main { flex: 1; min-width: 0; }
-
-.budget-row-name {
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 0.35rem;
-}
-
-.budget-row-sub { display: block; margin-top: 0.15rem; }
-
-.budget-row-head .cat-figures { flex: none; }
-
-.budget-row-action {
-    flex: none;
-    text-align: right;
-}
-
-/* Reserved whether or not this row is the one carrying the button, so the
-   totals stay in a column instead of stepping in and out by its width. Not on a
-   phone: there the column is too narrow to spend on a gap. */
-@media (min-width: 640px) {
-    .budget-row-action { min-width: 9rem; }
-}
-
-/* Indented past the caret, so the breakdown reads as belonging to the row above
-   it rather than as the next row down. */
-.budget-detail { padding: 0 0 0.6rem 1.5rem; }
-
-.budget-line { padding: 0.15rem 0; }
 
 /* A count on a tab, for history entries still standing. */
 .tab-count {
@@ -1817,9 +1760,12 @@ a.check-row-title:hover { color: var(--blue-600); }
     width: calc(var(--rad-inset) + var(--rad-gap) + var(--rad-size) + var(--rad-grow));
     height: calc(var(--rad-inset) + var(--rad-gap) + var(--rad-size) + var(--rad-grow));
 
-    /* What cuts the rail off flush against the edges of the window: the arc
-       deliberately overshoots the dock at both ends. */
-    overflow: hidden;
+    /* Deliberately not clipped. The menu this came from hung off the true
+       corner of the window, where an over-long rail could overshoot and be cut
+       flush against the walls -- it read as running off the screen. This dock
+       is lifted clear of the tab bar, so those same cuts would land in the
+       middle of the content with the band stopping bluntly in mid-air. The
+       rail is a self-contained quarter instead, and nothing needs cutting. */
 
     /* A closed dock is one button and a lot of empty box. Without this the box
        would swallow taps meant for the page underneath it. Open, it wants the
@@ -1856,8 +1802,12 @@ a.check-row-title:hover { color: var(--blue-600); }
 
 /* The rail the actions sit on: an SVG stroke rather than a masked ring,
    because a sweep-in has to animate and stroke-dashoffset is the one property
-   of a curve that transitions reliably everywhere. Mirrored, since the arc was
-   drawn to open from a left-hand corner and this one is on the right. */
+   of a curve that transitions reliably everywhere.
+
+   The box is square and centred on the anchor, so the quarter it draws lands
+   in the corner between the first slot and the last. It fits inside the dock
+   with room to spare, which is what lets the dock go unclipped and the shadow
+   below actually render. */
 .rad-arc {
     position: absolute;
     right: calc(var(--rad-center) - var(--rad-arc-outer));
@@ -1866,7 +1816,6 @@ a.check-row-title:hover { color: var(--blue-600); }
     height: calc(var(--rad-arc-outer) * 2);
     z-index: 3;
     overflow: visible;
-    transform: scaleX(-1);
     filter: drop-shadow(0 10px 22px rgba(15, 23, 42, 0.22));
     pointer-events: none;
 }
@@ -1875,6 +1824,13 @@ a.check-row-title:hover { color: var(--blue-600); }
     fill: none;
     stroke: var(--rad-rail);
     stroke-width: 32;
+
+    /* Rounded, because both ends of a quarter are on screen now. The old rail
+       ran off the edge of the window and never showed an end to shape. */
+    stroke-linecap: round;
+
+    /* Offset by the whole path length, which leaves the stroke entirely in the
+       dash pattern's gap: nothing is drawn, and no cap is left behind either. */
     stroke-dasharray: 100;
     stroke-dashoffset: 100;
     transition: stroke-dashoffset 270ms var(--rad-ease);
@@ -2018,6 +1974,14 @@ a.check-row-title:hover { color: var(--blue-600); }
     font-size: 0.68rem;
     font-weight: 700;
     line-height: 1.15rem;
+}
+
+/* The anchor's count is a stand-in for the ones it is hiding. Once the menu is
+   open they are on screen wearing their own, and the same nine sitting on both
+   the corner and the action it belongs to reads as eighteen. */
+.rad-open .rad-anchor .rad-count {
+    opacity: 0;
+    transition: opacity 120ms ease;
 }
 
 /* --- The hover blob ------------------------------------------------------- */
