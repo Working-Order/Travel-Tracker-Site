@@ -1734,3 +1734,408 @@ a.check-row-title:hover { color: var(--blue-600); }
 
     .msg { max-width: 92%; }
 }
+
+/* --- Radial menu -----------------------------------------------------------
+   The floating actions, gathered onto an arc around one anchor in the corner
+   the separate buttons used to compete for. See Shared/RadialMenu.razor for
+   what is drawn and wwwroot/js/radial-menu.js for what moves.
+
+   Everything is measured from the anchor's centre, which sits --rad-center in
+   from the bottom-right corner of the dock. x runs back towards the middle of
+   the screen, so the arc and the fan-out are laid out along negative x. */
+
+.rad-dock {
+    position: fixed;
+    right: 0;
+    bottom: calc(var(--nav-height) + var(--safe-bottom));
+
+    /* Above the assistant panel, the way the bubble it replaces was: on a
+       phone that panel is a full-screen sheet, and the button that closes it
+       has to stay reachable on top of it. */
+    z-index: 46;
+
+    /* Big enough to cover the whole fanned-out arc rather than just the closed
+       anchor, so moving a pointer through the gaps between the buttons does
+       not leave the dock and start the close timer. */
+    width: calc(var(--rad-inset) + var(--rad-gap) + var(--rad-size) + var(--rad-grow));
+    height: calc(var(--rad-inset) + var(--rad-gap) + var(--rad-size) + var(--rad-grow));
+
+    /* What cuts the rail off flush against the edges of the window: the arc
+       deliberately overshoots the dock at both ends. */
+    overflow: hidden;
+
+    /* A closed dock is one button and a lot of empty box. Without this the box
+       would swallow taps meant for the page underneath it. Open, it wants the
+       whole area back, so hovering across the gaps keeps it open. */
+    pointer-events: none;
+
+    --rad-inset: 8px;
+    --rad-size: 52px;
+    --rad-gap: 62px;
+    --rad-grow: 8px;
+    --rad-center: calc(var(--rad-inset) + var(--rad-size) / 2);
+
+    /* The rail is drawn at radius 68 with a stroke of 32 in its own units, so
+       its width is fixed against the gap at that ratio. Deriving it here keeps
+       the mask below and the drawing in step when the gap changes. */
+    --rad-band: calc(var(--rad-gap) * 32 / 68);
+    --rad-arc-outer: calc(var(--rad-gap) + var(--rad-band) / 2);
+    --rad-arc-inner: calc(var(--rad-gap) - var(--rad-band) / 2);
+
+    --rad-blob: calc(var(--rad-size) + 4px);
+    --rad-rail: #334155;
+    --rad-ease: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.rad-dock.rad-open {
+    pointer-events: auto;
+}
+
+@media (prefers-color-scheme: dark) {
+    .rad-dock {
+        --rad-rail: #1e293b;
+    }
+}
+
+/* The rail the actions sit on: an SVG stroke rather than a masked ring,
+   because a sweep-in has to animate and stroke-dashoffset is the one property
+   of a curve that transitions reliably everywhere. Mirrored, since the arc was
+   drawn to open from a left-hand corner and this one is on the right. */
+.rad-arc {
+    position: absolute;
+    right: calc(var(--rad-center) - var(--rad-arc-outer));
+    bottom: calc(var(--rad-center) - var(--rad-arc-outer));
+    width: calc(var(--rad-arc-outer) * 2);
+    height: calc(var(--rad-arc-outer) * 2);
+    z-index: 3;
+    overflow: visible;
+    transform: scaleX(-1);
+    filter: drop-shadow(0 10px 22px rgba(15, 23, 42, 0.22));
+    pointer-events: none;
+}
+
+.rad-arc path {
+    fill: none;
+    stroke: var(--rad-rail);
+    stroke-width: 32;
+    stroke-dasharray: 100;
+    stroke-dashoffset: 100;
+    transition: stroke-dashoffset 270ms var(--rad-ease);
+}
+
+.rad-open .rad-arc path {
+    stroke-dashoffset: 0;
+}
+
+/* --- The buttons ---------------------------------------------------------- */
+
+.rad-button {
+    position: absolute;
+    right: var(--rad-inset);
+    bottom: var(--rad-inset);
+    display: grid;
+    place-items: center;
+    width: var(--rad-size);
+    height: var(--rad-size);
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: transparent;
+    color: #fff;
+    cursor: pointer;
+}
+
+.rad-button svg {
+    width: 22px;
+    height: 22px;
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 1.9;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    filter: drop-shadow(0 1px 3px rgba(15, 23, 42, 0.5));
+}
+
+/* The anchor is the fixed point, not part of the fan-out: it is in the corner
+   whether the menu is open or shut, and it is the only thing there when it is
+   shut. */
+.rad-anchor {
+    z-index: 7;
+    pointer-events: auto;
+    background: var(--blue-600);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
+    transition: transform 160ms ease, box-shadow 120ms ease;
+}
+
+/* Pressed-in while the menu it opened is out, so the corner reads as held
+   rather than as another thing to choose from. */
+.rad-open .rad-anchor {
+    transform: scale(0.9);
+}
+
+.rad-items {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    z-index: 5;
+    width: 0;
+    height: 0;
+}
+
+/* Closed, each action rests where the one before it in the reveal chain ends
+   up, so re-collapsing walks the fan back in rather than dropping every button
+   into the corner at once. */
+.rad-items .rad-button {
+    z-index: 6;
+    opacity: 0;
+    pointer-events: none;
+    transform: translate(var(--sx, 0px), var(--sy, 0px)) scale(0.4);
+    transition: transform 220ms ease, opacity 140ms ease;
+}
+
+.rad-open .rad-items .rad-button {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translate(var(--fx, 0px), var(--fy, 0px)) scale(1);
+    transition: transform 320ms cubic-bezier(0.34, 1.56, 0.64, 1) var(--delay, 0ms),
+                opacity 180ms ease var(--delay, 0ms);
+}
+
+/* Reveal chain: the first action slides out beside the anchor, the second
+   starts from where the first landed and climbs, the third starts from there
+   and finishes above the anchor. Each start is the previous end, which is what
+   makes the fan-out read as one movement rather than three. */
+.rad-items [data-rad-slot="0"] {
+    --sx: 0px;
+    --sy: 0px;
+    --fx: calc(-1 * var(--rad-gap));
+    --fy: 0px;
+    --delay: 60ms;
+}
+
+.rad-items [data-rad-slot="1"] {
+    --sx: calc(-1 * var(--rad-gap));
+    --sy: 0px;
+    --fx: calc(-0.7 * var(--rad-gap));
+    --fy: calc(-0.7 * var(--rad-gap));
+    --delay: 150ms;
+}
+
+.rad-items [data-rad-slot="2"] {
+    --sx: calc(-0.7 * var(--rad-gap));
+    --sy: calc(-0.7 * var(--rad-gap));
+    --fx: 0px;
+    --fy: calc(-1 * var(--rad-gap));
+    --delay: 240ms;
+}
+
+/* Belongs to a page of the ring that is not the one showing. */
+.rad-open .rad-items .rad-off-page,
+.rad-items .rad-off-page {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transform: translate(var(--sx, 0px), var(--sy, 0px)) scale(0.35);
+}
+
+/* While the ring is turning, radial-menu.js drives every transform from a
+   spring, frame by frame. A transition would fight it, and a button halfway
+   round should not be catching presses meant for the one arriving. */
+.rad-turning .rad-items .rad-button {
+    transition: none;
+    pointer-events: none;
+}
+
+/* Actions nobody has decided on yet, counted on the action itself and, while
+   the menu is shut, on the anchor -- so a closed corner still says there is
+   something waiting. */
+.rad-count {
+    position: absolute;
+    top: -2px;
+    right: -2px;
+    min-width: 1.15rem;
+    padding: 0 0.3rem;
+    border-radius: 999px;
+    background: var(--danger);
+    color: #fff;
+    font-size: 0.68rem;
+    font-weight: 700;
+    line-height: 1.15rem;
+}
+
+/* --- The hover blob ------------------------------------------------------- */
+
+/* On a layer of its own, which carries the hole around the anchor in fixed
+   dock coordinates. That is what lets the blob travel between buttons without
+   ever painting into the gap that keeps the anchor looking detached from the
+   rail -- a mask on the blob itself would have to be recomputed for every
+   position it passes through. */
+.rad-blob-layer {
+    position: absolute;
+    inset: 0;
+    z-index: 4;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    -webkit-mask: radial-gradient(circle at calc(100% - var(--rad-center)) calc(100% - var(--rad-center)),
+        transparent 0 calc(var(--rad-arc-inner) - 1px), #000 var(--rad-arc-inner));
+    mask: radial-gradient(circle at calc(100% - var(--rad-center)) calc(100% - var(--rad-center)),
+        transparent 0 calc(var(--rad-arc-inner) - 1px), #000 var(--rad-arc-inner));
+}
+
+.rad-blob-on .rad-blob-layer {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Blur plus a steep alpha curve: where the two circles overlap, their blurred
+   alpha sums back past the threshold and they read as one body with a neck.
+   Their motion is sprung in JavaScript, so there are deliberately no
+   transitions here. */
+.rad-goo {
+    position: absolute;
+    inset: 0;
+    filter: url(#radGooFilter);
+    pointer-events: none;
+}
+
+.rad-bubble {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: var(--rad-blob);
+    height: var(--rad-blob);
+    border-radius: 50%;
+    background: var(--rad-rail);
+    transform: scale(0);
+}
+
+.rad-bubble-tail {
+    width: calc(var(--rad-blob) * 0.8);
+    height: calc(var(--rad-blob) * 0.8);
+}
+
+.rad-goo-defs {
+    position: absolute;
+    width: 0;
+    height: 0;
+}
+
+/* --- Pages ---------------------------------------------------------------- */
+
+.rad-pager {
+    position: absolute;
+    inset: 0;
+    z-index: 5;
+    opacity: 0;
+    visibility: hidden;
+
+    /* The layer spans the dock, so only the dots themselves may catch a press. */
+    pointer-events: none;
+    transition: opacity 200ms ease 140ms, visibility 200ms ease 140ms;
+}
+
+.rad-open .rad-pager {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Spread along the 45-degree diagonal of the gap between the anchor and the
+   rail, centred on it so adding a page grows the row both ways rather than
+   pushing it into the rail. */
+.rad-pager-dot {
+    position: absolute;
+    display: grid;
+    place-items: center;
+    width: 16px;
+    height: 16px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+    pointer-events: auto;
+    --rad-dot-step: calc((var(--rad-dot) - (var(--rad-dots) - 1) / 2) * 11px);
+    right: calc(var(--rad-center) + 31px + var(--rad-dot-step));
+    bottom: calc(var(--rad-center) + 31px - var(--rad-dot-step));
+    transform: translate(50%, 50%);
+}
+
+.rad-pager-dot::after {
+    content: "";
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: rgba(100, 116, 139, 0.45);
+    transition: background 150ms ease, transform 150ms ease;
+}
+
+.rad-pager-dot:hover::after {
+    background: rgba(100, 116, 139, 0.75);
+}
+
+.rad-pager-dot-active::after {
+    background: var(--rad-rail);
+    transform: scale(1.3);
+}
+
+/* --- The tooltip ---------------------------------------------------------- */
+
+/* Fixed, and put on the body by radial-menu.js, because the dock clips its own
+   overflow and a pill inside it would be cut off with the rail. */
+.rad-tip {
+    position: fixed;
+    z-index: 80;
+    transform: translate(-50%, -100%);
+    padding: 5px 10px;
+    border-radius: 6px;
+    background: var(--text);
+    color: var(--bg);
+    font-size: 0.72rem;
+    font-weight: 600;
+    white-space: nowrap;
+    box-shadow: 0 6px 16px rgba(15, 23, 42, 0.3);
+    pointer-events: none;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 120ms ease, transform 120ms ease, visibility 120ms;
+}
+
+.rad-tip-on {
+    opacity: 1;
+    visibility: visible;
+    transform: translate(-50%, calc(-100% - 4px));
+}
+
+@media (max-width: 380px) {
+    .rad-dock {
+        --rad-size: 48px;
+        --rad-gap: 56px;
+    }
+}
+
+@media (min-width: 1024px) {
+    /* No tab bar to clear on a wide window, so the dock sits in the corner
+       itself and the anchor keeps its distance the way the assistant panel
+       does. */
+    .rad-dock {
+        bottom: 0;
+        --rad-inset: 20px;
+    }
+}
+
+/* The rail still sweeps and the buttons still travel -- that is how the menu
+   says where its actions went, and removing it leaves them appearing from
+   nowhere. What goes is the overshoot and the sprung blob, which are there to
+   be enjoyed rather than to be understood. radial-menu.js drops the blob and
+   snaps the ring to match. */
+@media (prefers-reduced-motion: reduce) {
+    .rad-items .rad-button,
+    .rad-open .rad-items .rad-button {
+        transition: transform 140ms ease, opacity 120ms ease;
+    }
+
+    .rad-anchor,
+    .rad-pager-dot::after {
+        transition: none;
+    }
+}
