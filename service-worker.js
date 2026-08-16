@@ -9,7 +9,7 @@
 // imported service-worker-assets.js. Without a stamp here, a publish can ship
 // entirely new assets behind a service worker the browser considers identical,
 // and the installed app never updates.
-const buildVersion = "20260816-033021-f46f455";
+const buildVersion = "20260816-045259-ce04c4f";
 
 self.importScripts('./service-worker-assets.js');
 self.addEventListener('install', event => event.waitUntil(onInstall(event)));
@@ -75,4 +75,4 @@ async function onFetch(event) {
 
     return cachedResponse || fetch(event.request);
 }
-/* Manifest version: QmcusCY0-1786851022 */
+/* Manifest version: wRllK97G-1786855979 */

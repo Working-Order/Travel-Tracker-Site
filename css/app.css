@@ -1413,6 +1413,131 @@ a.check-row-title:hover { color: var(--blue-600); }
     padding: 0.7rem 1rem;
     border-bottom: 1px solid var(--border);
     background: var(--surface);
+
+    /* The panel is dragged by its header, so the header must not be selectable
+       text or every drag would highlight the trip name instead. */
+    user-select: none;
+    touch-action: none;
+}
+
+/* Recent chats, opened from the header. Sits over the conversation rather than
+   pushing it down, so dismissing it puts everything back where it was. */
+.chat-switcher {
+    position: absolute;
+    top: 3.4rem;
+    right: 0.75rem;
+    left: 0.75rem;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+    padding: 0.4rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--surface);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.25);
+}
+
+.chat-switcher-row {
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+    width: 100%;
+    padding: 0.45rem 0.6rem;
+    border: 0;
+    border-radius: var(--radius-sm);
+    background: transparent;
+    color: var(--text);
+    font-size: 0.88rem;
+    font-weight: 600;
+    text-align: left;
+}
+
+.chat-switcher-row:hover { background: var(--surface-alt); }
+
+.chat-switcher-row.active {
+    background: var(--blue-50);
+    color: var(--blue-600);
+}
+
+.chat-switcher-row .truncate { flex: 1; }
+
+.chat-switcher-foot {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding-top: 0.35rem;
+    margin-top: 0.2rem;
+    border-top: 1px solid var(--border);
+}
+
+.chat-tabs {
+    display: flex;
+    gap: 0.25rem;
+    padding: 0.5rem 1rem 0;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+}
+
+.chat-tabs button {
+    padding: 0.4rem 0.75rem;
+    border: 0;
+    border-bottom: 2px solid transparent;
+    border-radius: 0;
+    background: transparent;
+    color: var(--text-dim);
+    font-size: 0.88rem;
+    font-weight: 650;
+}
+
+.chat-tabs button.active {
+    border-bottom-color: var(--blue-600);
+    color: var(--blue-600);
+}
+
+/* --- What the assistant can do ------------------------------------------- */
+
+.tools {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    padding: 0.85rem 1rem calc(var(--safe-bottom) + 1rem);
+}
+
+.tools-intro { margin-bottom: 0.75rem; }
+
+.tools-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+
+.tools-action {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+    width: 100%;
+    padding: 0.5rem 0.6rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--surface-alt);
+    color: inherit;
+    text-align: left;
+}
+
+.tools-action:hover { border-color: var(--blue-600); }
+
+.tools-action-title {
+    font-size: 0.9rem;
+    font-weight: 650;
+}
+
+/* A chat in the history list: a card-sized button that keeps the row layout. */
+.chat-row {
+    display: block;
+    width: 100%;
+    padding: 0;
+    text-align: left;
 }
 
 /* The chat itself: a scrolling column of turns with the composer pinned under
@@ -1494,7 +1619,22 @@ a.check-row-title:hover { color: var(--blue-600); }
     flex: 1;
     min-width: 0;
     margin: 0;
+    /* One line to start, matching the Send button beside it, and up to five
+       before it scrolls. A two-line box that is empty most of the time steals
+       the height from the conversation above it. */
+    height: 2.6rem;
+    min-height: 2.6rem;
+    max-height: 8rem;
+    padding-top: 0.55rem;
+    padding-bottom: 0.55rem;
     resize: none;
+    overflow-y: auto;
+}
+
+.composer button {
+    height: 2.6rem;
+    padding-top: 0;
+    padding-bottom: 0;
 }
 
 .composer button { flex: none; }
@@ -1503,6 +1643,7 @@ a.check-row-title:hover { color: var(--blue-600); }
     /* Docked, not full screen: the point of the bubble is that the trip stays
        on screen behind the conversation. */
     .chat-panel {
+        position: fixed;
         inset: auto 1.25rem 1.25rem auto;
         width: 420px;
         height: min(620px, calc(100dvh - 6rem));
@@ -1512,7 +1653,18 @@ a.check-row-title:hover { color: var(--blue-600); }
         overflow: hidden;
     }
 
-    .chat-panel-head { border-radius: 18px 18px 0 0; }
+    .chat-panel-head {
+        border-radius: 18px 18px 0 0;
+        cursor: grab;
+    }
+
+    /* No transition while dragging: the panel has to track the pointer exactly,
+       and a lagging panel feels broken rather than smooth. */
+    .chat-panel.dragging {
+        user-select: none;
+    }
+
+    .chat-panel.dragging .chat-panel-head { cursor: grabbing; }
 
     .chat-bubble {
         right: 1.25rem;
