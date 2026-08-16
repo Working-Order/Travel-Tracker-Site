@@ -968,13 +968,6 @@ h1:focus-visible {
 
 .cat-sub { margin-top: 0.25rem; }
 
-/* Separates the locked-in budget from the revision underneath it. */
-.budget-block {
-    margin-top: 0.75rem;
-    padding-top: 0.75rem;
-    border-top: 1px solid var(--border);
-}
-
 /* --- Collapsible cost groups ------------------------------------------------
    The header is a button so it is reachable by keyboard and announces its
    expanded state, but it has to read as a list row, hence the reset. */
