@@ -1,7 +1,7 @@
 {
   "mainAssemblyName": "TravelTracker.Mobile",
   "resources": {
-    "hash": "sha256-dZutZgZx22akB8kpJt2Wxwj9V0VJLdFhVfeI+IPdCys=",
+    "hash": "sha256-CbwHtdN4vVKKyAs49Z8NFrni6v2TOi+HSLBFMaMarMU=",
     "jsModuleNative": {
       "dotnet.native.8.0.23.fp7960u1ej.js": "sha256-NljIbpK/1KCj0+knpX8U77Rbl5kTtfFIuFjK7AuczEw="
     },
@@ -55,8 +55,8 @@
       "System.Text.RegularExpressions.wasm": "sha256-TH9NbQZf85Ehx3D+ZZkJBprnUSKBHUA22PD/xIEIFek=",
       "System.Threading.wasm": "sha256-ZBXLPz+TmsaIiwImi/RaEv3rTNGy7bRGO+5nvLJJuYU=",
       "System.wasm": "sha256-tF8W2YKc8aZCr0Ve8H9C2Pn58tjopgQpqHl/hJ3Ygi4=",
-      "TravelTracker.Core.wasm": "sha256-cafyRD97RAArabtjOQGJqRH9YadVIeFPcA/qiXpFjfQ=",
-      "TravelTracker.Mobile.wasm": "sha256-lDQloaBC0j8MBlnp+2IpVbYypPc0MIU5PgU9zHNfbXs="
+      "TravelTracker.Core.wasm": "sha256-VSxBwPTIsKHDxFfSqPgds2sDbWLNg+YUMxMtDuWuU8M=",
+      "TravelTracker.Mobile.wasm": "sha256-LmWaDQTBd2KAIkuDOynPSRttAQaUACZXwlSRi0hYUR8="
     }
   },
   "cacheBootResources": true,
