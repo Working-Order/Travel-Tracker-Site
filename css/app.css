@@ -1341,14 +1341,105 @@ a.check-row-title {
 a.check-row-title:hover { color: var(--blue-600); }
 
 /* --- Trip assistant ----------------------------------------------------------
-   A conversation reads as a column of turns, not as a list of cards: the user's
-   questions sit right and tight, the answers sit left and open. The suggestion
-   rows inside an answer deliberately reuse the check-row vocabulary from the
-   plan and packing screens, because that is exactly what they become. */
+   A bubble over the trip rather than a screen beside it, so an answer can be
+   read against the page it is about. On a phone the panel takes the screen,
+   because a 340px column of chat inside a 375px window is not a panel; on a
+   desktop it docks bottom-right and leaves the trip visible behind it. */
 
-.chat-page {
+/* Hidden while the panel is open: the panel has its own close button, and on a
+   phone the bubble lands squarely on top of the Send key. */
+.chat-bubble.open { display: none; }
+
+.chat-bubble {
+    position: fixed;
+    right: 1rem;
+    bottom: calc(var(--nav-height) + var(--safe-bottom) + 1rem);
+    z-index: 45;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 52px;
+    height: 52px;
+    padding: 0;
+    border: none;
+    border-radius: 50%;
+    background: var(--blue-600);
+    color: #fff;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
+    font-size: 1.6rem;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.chat-bubble svg {
+    width: 24px;
+    height: 24px;
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+/* Actions nobody has decided on yet, including ones another traveller's
+   question produced. */
+.chat-bubble-count {
+    position: absolute;
+    top: -2px;
+    right: -2px;
+    min-width: 1.15rem;
+    padding: 0 0.3rem;
+    border-radius: 999px;
+    background: var(--danger);
+    font-size: 0.68rem;
+    font-weight: 700;
+    line-height: 1.15rem;
+}
+
+.chat-panel {
+    position: fixed;
+    inset: 0;
+    z-index: 44;
     display: flex;
     flex-direction: column;
+    padding-top: var(--safe-top);
+    background: var(--bg);
+}
+
+.chat-panel-head {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.7rem 1rem;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+}
+
+/* The chat itself: a scrolling column of turns with the composer pinned under
+   it, sized by the panel rather than by the page. */
+.chat {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+    padding: 0 1rem;
+}
+
+.chat-scroll {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    padding: 0.85rem 0 0.25rem;
+    -webkit-overflow-scrolling: touch;
+}
+
+.chat-intro { margin-bottom: 0.85rem; }
+
+.chat-footnote {
+    padding-bottom: calc(var(--safe-bottom) + 0.6rem);
+    margin-top: -0.35rem;
 }
 
 .msg {
@@ -1366,9 +1457,7 @@ a.check-row-title:hover { color: var(--blue-600); }
     background: var(--blue-50);
 }
 
-.msg-bot {
-    align-self: flex-start;
-}
+.msg-bot { align-self: flex-start; }
 
 .msg-meta {
     display: flex;
@@ -1380,7 +1469,7 @@ a.check-row-title:hover { color: var(--blue-600); }
 }
 
 /* Answers arrive with their own line breaks, and a paragraph the model meant as
-   two is not one. Long place names and URLs wrap rather than widen the page. */
+   two is not one. Long place names and URLs wrap rather than widen the panel. */
 .msg-text {
     white-space: pre-wrap;
     overflow-wrap: anywhere;
@@ -1392,18 +1481,12 @@ a.check-row-title:hover { color: var(--blue-600); }
     border-top: 1px solid var(--border);
 }
 
-/* Stays within reach while the thread scrolls behind it. It clears the tab bar
-   on a phone, and sits at the foot of the content column on a desktop, where
-   there is no tab bar to clear. */
 .composer {
-    position: sticky;
-    bottom: calc(var(--nav-height) + var(--safe-bottom));
-    z-index: 10;
     display: flex;
     align-items: flex-end;
     gap: 0.5rem;
-    margin-top: 0.25rem;
-    padding: 0.6rem 0;
+    padding: 0.6rem 0 0.5rem;
+    border-top: 1px solid var(--border);
     background: var(--bg);
 }
 
@@ -1414,21 +1497,27 @@ a.check-row-title:hover { color: var(--blue-600); }
     resize: none;
 }
 
-.composer button {
-    flex: none;
-}
+.composer button { flex: none; }
 
 @media (min-width: 1024px) {
-    .chat-page {
-        max-width: 900px;
+    /* Docked, not full screen: the point of the bubble is that the trip stays
+       on screen behind the conversation. */
+    .chat-panel {
+        inset: auto 1.25rem 1.25rem auto;
+        width: 420px;
+        height: min(620px, calc(100dvh - 6rem));
+        border: 1px solid var(--border);
+        border-radius: 18px;
+        box-shadow: 0 18px 48px rgba(0, 0, 0, 0.28);
+        overflow: hidden;
     }
 
-    .msg {
-        max-width: 78%;
+    .chat-panel-head { border-radius: 18px 18px 0 0; }
+
+    .chat-bubble {
+        right: 1.25rem;
+        bottom: 1.25rem;
     }
 
-    .composer {
-        bottom: 0;
-        padding-bottom: 1rem;
-    }
+    .msg { max-width: 92%; }
 }
