@@ -435,6 +435,74 @@ button:disabled { opacity: 0.5; cursor: default; }
     line-height: 1;
 }
 
+/* A rounded button that reads as one control with its icon. Works on anchors
+   as well as buttons, which is why it carries its own layout and underline
+   reset rather than leaning on the button element defaults. */
+.btn-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    border-radius: 999px;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.btn-pill svg {
+    width: 14px;
+    height: 14px;
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 2.2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+/* A quiet sibling for btn-primary: tinted, not outlined, for the action that
+   should read as a button without competing with the primary one beside it. */
+.btn-soft {
+    padding: 0.35rem 0.6rem;
+    border: 1px solid transparent;
+    background: var(--blue-50);
+    color: var(--blue-600);
+    font-size: 0.8rem;
+    font-weight: 650;
+}
+
+.btn-soft:hover { border-color: var(--blue-600); }
+
+/* The header's way back. An anchor styled as a quiet round target: the text
+   arrow it replaces sat off-centre and lit up like a link, which made the most
+   pressed control in the header the scruffiest thing in it. */
+.btn-back {
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    margin-left: -0.35rem;
+    border-radius: 50%;
+    color: var(--text);
+    text-decoration: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.btn-back svg {
+    width: 20px;
+    height: 20px;
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 2.1;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.btn-back:hover,
+.btn-back:active {
+    background: var(--surface-alt);
+    color: var(--blue-600);
+}
+
 .fab {
     position: fixed;
     right: 1rem;
@@ -1425,6 +1493,47 @@ a.check-row-title:hover { color: var(--blue-600); }
     touch-action: none;
 }
 
+/* The switcher's handle in the panel header. A pill rather than bare text,
+   because it opens a menu and should look like it does: icon, label, and a
+   caret that turns while the menu is up. */
+.chat-pick {
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.32rem 0.6rem;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: var(--surface-alt);
+    color: var(--text);
+    font-size: 0.8rem;
+    font-weight: 650;
+}
+
+.chat-pick svg {
+    width: 14px;
+    height: 14px;
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.chat-pick:hover,
+.chat-pick[aria-expanded="true"] {
+    border-color: var(--blue-600);
+    color: var(--blue-600);
+}
+
+.chat-pick-caret { transition: transform 0.15s ease; }
+
+.chat-pick-caret.open { transform: rotate(180deg); }
+
+@media (prefers-reduced-motion: reduce) {
+    .chat-pick-caret { transition: none; }
+}
+
 /* Recent chats, opened from the header. Sits over the conversation rather than
    pushing it down, so dismissing it puts everything back where it was. */
 .chat-switcher {
@@ -1467,12 +1576,21 @@ a.check-row-title:hover { color: var(--blue-600); }
 
 .chat-switcher-row .truncate { flex: 1; }
 
+.chat-switcher-label {
+    padding: 0.25rem 0.6rem 0.3rem;
+    color: var(--text-faint);
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+
 .chat-switcher-foot {
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    padding-top: 0.35rem;
-    margin-top: 0.2rem;
+    padding: 0.5rem 0.2rem 0.1rem;
+    margin-top: 0.3rem;
     border-top: 1px solid var(--border);
 }
 
@@ -1509,32 +1627,133 @@ a.check-row-title:hover { color: var(--blue-600); }
     padding: 0.85rem 1rem calc(var(--safe-bottom) + 1rem);
 }
 
-.tools-intro { margin-bottom: 0.75rem; }
+/* Flat groups, not cards-in-cards: a small area heading with an Open link, a
+   line on what may change there, and the jobs as rows. The rows carry the
+   visual weight; everything around them stays quiet. */
 
-.tools-actions {
-    display: flex;
-    flex-direction: column;
-    gap: 0.35rem;
+.agent-note {
+    margin-bottom: 1rem;
+    color: var(--text-dim);
+    font-size: 0.82rem;
 }
 
-.tools-action {
+.agent-area { margin-bottom: 1.2rem; }
+
+.agent-area-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+}
+
+.agent-area-head h3 {
+    color: var(--text-dim);
+    font-size: 0.76rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+
+.agent-area-open {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.1rem;
+    font-size: 0.75rem;
+    font-weight: 650;
+    text-decoration: none;
+}
+
+.agent-area-open svg {
+    width: 13px;
+    height: 13px;
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 2.2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.agent-area-reach {
+    margin: 0.2rem 0 0.4rem;
+    color: var(--text-faint);
+    font-size: 0.75rem;
+}
+
+.agent-flows {
     display: flex;
     flex-direction: column;
     gap: 0.1rem;
+}
+
+/* One job. The whole row is the button, with the glyph carrying the accent and
+   a chevron saying it goes somewhere -- into the chat -- rather than toggling
+   in place. */
+.agent-flow {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
     width: 100%;
-    padding: 0.5rem 0.6rem;
-    border: 1px solid var(--border);
+    padding: 0.45rem 0.5rem;
+    margin: 0 -0.5rem;
+    border: 0;
     border-radius: var(--radius-sm);
-    background: var(--surface-alt);
+    background: transparent;
     color: inherit;
     text-align: left;
 }
 
-.tools-action:hover { border-color: var(--blue-600); }
+.agent-flow:hover { background: var(--surface-alt); }
 
-.tools-action-title {
-    font-size: 0.9rem;
+.agent-flow:hover .agent-flow-title { color: var(--blue-600); }
+
+.agent-flow-spark {
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    border-radius: 9px;
+    background: var(--blue-50);
+    color: var(--blue-600);
+}
+
+.agent-flow-spark svg {
+    width: 16px;
+    height: 16px;
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 1.6;
+    stroke-linejoin: round;
+}
+
+.agent-flow-text {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 0.05rem;
+    min-width: 0;
+}
+
+.agent-flow-title {
+    font-size: 0.88rem;
     font-weight: 650;
+}
+
+.agent-flow-sub {
+    color: var(--text-faint);
+    font-size: 0.75rem;
+}
+
+.agent-flow-go {
+    flex: none;
+    width: 14px;
+    height: 14px;
+    stroke: var(--text-faint);
+    fill: none;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
 }
 
 /* --- The budgets on the table -----------------------------------------------
@@ -1825,14 +2044,6 @@ a.check-row-title:hover { color: var(--blue-600); }
     text-decoration: line-through;
 }
 
-/* A chat in the history list: a card-sized button that keeps the row layout. */
-.chat-row {
-    display: block;
-    width: 100%;
-    padding: 0;
-    text-align: left;
-}
-
 /* The chat itself: a scrolling column of turns with the composer pinned under
    it, sized by the panel rather than by the page. */
 .chat {
@@ -1972,6 +2183,162 @@ a.check-row-title:hover { color: var(--blue-600); }
     .msg { max-width: 92%; }
 }
 
+/* --- The chats page ----------------------------------------------------------
+   The conversation as a screen of its own. The floating panel closes at the
+   door -- see AssistantBubble -- and the same chat component is embedded full
+   height instead, with the other views (the assistant's jobs, every chat the
+   trip has had) riding along as segments rather than a side menu.
+
+   The page is the app's one viewport-height column: the thread scrolls inside
+   it and the composer holds still above the tab bar, instead of the page
+   scrolling past both. */
+
+.shell-main:has(.chat-page) {
+    display: flex;
+    flex-direction: column;
+    height: 100dvh;
+    min-height: 0;
+}
+
+/* Nothing scrolls past the header here, so it has nothing to stick to. */
+.shell-main:has(.chat-page) .shell-header { position: static; }
+
+.chat-page {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+    padding-bottom: calc(var(--nav-height) + var(--safe-bottom) + 0.6rem);
+}
+
+/* The shell already pads the page, so the chat gives up the panel padding it
+   carries for the bubble... */
+.chat-page .chat { padding: 0; }
+
+/* ...and the safe-area padding the panel needed at the true bottom edge. */
+.chat-page .chat-footnote { padding-bottom: 0.1rem; }
+
+.chat-page .tools { padding: 0.15rem 0 0.75rem; }
+
+/* The list view scrolls on its own, like the chat and the tools do, so the
+   segmented switch above it never scrolls away. */
+.chat-page-pane {
+    flex: 1;
+    min-height: 0;
+    padding-bottom: 0.5rem;
+    overflow-y: auto;
+}
+
+/* --- Segmented switch ------------------------------------------------------
+   One control choosing between a page's views: a pill track with the chosen
+   segment raised, instead of a second row of underlined tabs or a side menu. */
+
+.seg {
+    display: flex;
+    flex: none;
+    gap: 0.2rem;
+    width: fit-content;
+    max-width: 100%;
+    margin-bottom: 0.7rem;
+    padding: 0.2rem;
+    border-radius: 999px;
+    background: var(--surface-alt);
+    overflow-x: auto;
+}
+
+.seg button {
+    flex: none;
+    padding: 0.35rem 0.85rem;
+    border: 0;
+    border-radius: 999px;
+    background: transparent;
+    color: var(--text-dim);
+    font-size: 0.83rem;
+    font-weight: 650;
+    white-space: nowrap;
+}
+
+.seg button.active {
+    background: var(--surface);
+    color: var(--text);
+    box-shadow: 0 1px 4px rgba(15, 23, 42, 0.16);
+}
+
+.seg button.active .tab-count {
+    background: var(--blue-600);
+    color: #fff;
+}
+
+/* --- Every chat the trip has had -------------------------------------------
+   Rows in one bordered list, not a grid of cards: the page is for finding a
+   conversation, and names under names scan faster than boxes beside boxes. */
+
+.chat-list {
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--surface);
+    overflow: hidden;
+}
+
+.chat-list-row {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding-right: 0.6rem;
+}
+
+.chat-list-row + .chat-list-row { border-top: 1px solid var(--border); }
+
+.chat-list-row:hover { background: var(--surface-alt); }
+
+/* The open conversation, marked by an edge rather than a fill: the fill is the
+   hover's, and a row that arrives pre-filled looks already pressed. */
+.chat-list-row.active { box-shadow: inset 3px 0 0 var(--blue-600); }
+
+.chat-list-main {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 0.15rem;
+    min-width: 0;
+    padding: 0.7rem 0.85rem;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    color: inherit;
+    font-weight: 400;
+    text-align: left;
+}
+
+.chat-list-title {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    min-width: 0;
+    font-size: 0.92rem;
+    font-weight: 650;
+}
+
+.chat-list-title .truncate { min-width: 0; }
+
+.chat-list-delete { flex: none; color: var(--text-faint); }
+
+/* Red only once armed: a Delete that is red before the confirming press spends
+   its warning on the tap that does nothing. */
+.chat-list-delete:hover,
+.chat-list-delete.confirm { color: var(--danger); }
+
+.chat-list-foot { margin-top: 0.6rem; }
+
+@media (min-width: 1024px) {
+    /* A chat line the width of the whole content column cannot be tracked back
+       to its start; the page keeps to a conversation's width instead. */
+    .chat-page {
+        max-width: 860px;
+        padding-bottom: 1.5rem;
+    }
+}
+
 /* --- Radial menu -----------------------------------------------------------
    The floating actions, gathered onto an arc around one anchor in the corner
    the separate buttons used to compete for. See Shared/RadialMenu.razor for
@@ -2023,7 +2390,6 @@ a.check-row-title:hover { color: var(--blue-600); }
     --rad-arc-inner: calc(var(--rad-gap) - var(--rad-band) / 2);
 
     --rad-blob: calc(var(--rad-size) + 4px);
-    --rad-rail: #334155;
     --rad-ease: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
@@ -2031,8 +2397,16 @@ a.check-row-title:hover { color: var(--blue-600); }
     pointer-events: auto;
 }
 
+/* Declared on the root rather than on the dock, because the label below is
+   put on the body -- it has to escape a dock sized to the menu itself -- and
+   it borrows this colour to look like part of that menu rather than like a
+   tooltip the browser threw in. */
+:root {
+    --rad-rail: #334155;
+}
+
 @media (prefers-color-scheme: dark) {
-    .rad-dock {
+    :root {
         --rad-rail: #1e293b;
     }
 }
@@ -2338,30 +2712,43 @@ a.check-row-title:hover { color: var(--blue-600); }
 
 /* --- The tooltip ---------------------------------------------------------- */
 
-/* Fixed, and put on the body by radial-menu.js, because the dock clips its own
-   overflow and a pill inside it would be cut off with the rail. */
+/* Put on the body by radial-menu.js, because the dock is only as big as the
+   menu and a label reaching past the outermost button would be cut off by it.
+
+   Dressed as part of the menu rather than as a tooltip: the rail colour it sits
+   on, and a full pill radius to match the buttons it names. It used to be the
+   page text colour in a rounded rectangle, which is what a browser tooltip
+   looks like, and it read as one thing arriving over another rather than as the
+   menu saying what it is offering.
+
+   Centred on the point radial-menu.js works out, rather than sitting above it:
+   the placement is a direction and a distance, and both axes are already in
+   that number. */
 .rad-tip {
     position: fixed;
     z-index: 80;
-    transform: translate(-50%, -100%);
-    padding: 5px 10px;
-    border-radius: 6px;
-    background: var(--text);
-    color: var(--bg);
+    transform: translate(-50%, -50%) scale(0.94);
+    padding: 5px 11px;
+    border-radius: 999px;
+    background: var(--rad-rail);
+    color: #fff;
     font-size: 0.72rem;
     font-weight: 600;
     white-space: nowrap;
-    box-shadow: 0 6px 16px rgba(15, 23, 42, 0.3);
+
+    /* Softer than it was. The label is beside the menu now, not over the top of
+       it, so it has nothing to lift itself off. */
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.22);
     pointer-events: none;
     opacity: 0;
     visibility: hidden;
-    transition: opacity 120ms ease, transform 120ms ease, visibility 120ms;
+    transition: opacity 110ms ease, transform 110ms ease, visibility 110ms;
 }
 
 .rad-tip-on {
     opacity: 1;
     visibility: visible;
-    transform: translate(-50%, calc(-100% - 4px));
+    transform: translate(-50%, -50%) scale(1);
 }
 
 @media (max-width: 380px) {

@@ -32,6 +32,9 @@ const CLOSE_DELAY = 450;
 /** A drag this far along the arc is a page turn rather than a press. */
 const SWIPE_DISTANCE = 34;
 
+/** Air between the outside of a button and the label naming it. */
+const TIP_GAP = 10;
+
 let live = null;
 
 /**
@@ -205,7 +208,7 @@ function build(dock) {
         const center = inset + size / 2;
         const radius = parseFloat(styles.getPropertyValue("--rad-gap")) || 62;
 
-        return { cx: box.width - center, cy: box.height - center, radius };
+        return { cx: box.width - center, cy: box.height - center, radius, size };
     }
 
     function buttons() {
@@ -558,6 +561,16 @@ function build(dock) {
 
     // --- the tooltip --------------------------------------------------------
 
+    // The label goes straight out along the same spoke its action sits on,
+    // beyond the ring.
+    //
+    // Put where a tooltip usually goes -- floating just above the thing it
+    // names -- it lands on top of the next action along instead, because on a
+    // quarter circle the space above one button is where its neighbour lives.
+    // Outside the ring there is nothing to cover: every action sits at one
+    // radius, so anything past that radius is clear by construction. It also
+    // reads as belonging to the button it is in line with, rather than to
+    // whichever one it happens to be floating over.
     function showTip(target) {
         const text = target?.dataset.radTip;
 
@@ -568,11 +581,30 @@ function build(dock) {
         tip.textContent = text;
         tip.classList.add("rad-tip-on");
 
-        const rect = target.getBoundingClientRect();
-        const half = tip.offsetWidth / 2;
+        const box = dock.getBoundingClientRect();
+        const { cx, cy, radius, size } = metrics();
+        const originX = box.left + cx;
+        const originY = box.top + cy;
 
-        tip.style.left = `${Math.min(Math.max(rect.left + rect.width / 2, half + 8), window.innerWidth - half - 8)}px`;
-        tip.style.top = `${rect.top - 8}px`;
+        const rect = target.getBoundingClientRect();
+        const alongX = rect.left + rect.width / 2 - originX;
+        const alongY = rect.top + rect.height / 2 - originY;
+        const length = Math.hypot(alongX, alongY) || 1;
+        const ux = alongX / length;
+        const uy = alongY / length;
+
+        // Out past the button, then out again by half the label measured along
+        // the direction it is heading. Without that second part a wide label on
+        // a flat spoke would reach back over the button it names, and a tall
+        // one would do the same going straight up.
+        const clear = radius + size / 2 + TIP_GAP;
+        const reach = clear + (Math.abs(ux) * tip.offsetWidth + Math.abs(uy) * tip.offsetHeight) / 2;
+
+        const halfWidth = tip.offsetWidth / 2;
+        const halfHeight = tip.offsetHeight / 2;
+
+        tip.style.left = `${clamp(originX + ux * reach, halfWidth + 8, window.innerWidth - halfWidth - 8)}px`;
+        tip.style.top = `${clamp(originY + uy * reach, halfHeight + 8, window.innerHeight - halfHeight - 8)}px`;
     }
 
     function hideTip() {
@@ -840,6 +872,11 @@ function build(dock) {
             tip.remove();
         },
     };
+}
+
+/** Keeps a label on screen when a spoke points at an edge. */
+function clamp(value, low, high) {
+    return Math.min(Math.max(value, low), high);
 }
 
 /**
