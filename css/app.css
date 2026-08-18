@@ -959,8 +959,11 @@ h1:focus-visible {
 
 .cat-name { font-size: 0.9rem; font-weight: 600; }
 
-/* Amounts never wrap: a figure broken across two lines stops being a figure. */
-.cat-figures { font-size: 0.9rem; white-space: nowrap; }
+/* Amounts never wrap: a figure broken across two lines stops being a figure, and
+   tabular figures so a column of them lines up digit under digit: proportional
+   digits give two totals two different widths, and a column of different widths
+   has to be read rather than seen. */
+.cat-figures { font-size: 0.9rem; white-space: nowrap; font-variant-numeric: tabular-nums; }
 
 .cat-figures .faint { font-size: 0.8rem; }
 
@@ -1538,11 +1541,53 @@ a.check-row-title:hover { color: var(--blue-600); }
    A list, not a grid of cards. Cards made each budget recite its whole contents
    at once, so comparing two of them meant reading two paragraphs; rows put the
    names under one another and the totals in a column, and hold the breakdown
-   behind a caret until it is wanted. */
+   behind a caret until it is wanted.
 
-.budget-item { border-bottom: 1px solid var(--border); }
+   Five things are doing the work here, and they are worth naming because each
+   one is carrying a different part of the load:
 
-.card-tight > .budget-item:last-child { border-bottom: none; }
+   1. Progressive disclosure. One line per budget until asked; the breakdown,
+      the notes and every control that changes a budget live behind the caret.
+   2. State read before the words are. The row up for sign-off and the row that
+      is the budget are washed and edged in their own colour, so which is which
+      survives a glance at arm's length.
+   3. Figures in a column, in tabular numerals. Digits line up under digits, so
+      $1,200.00 against $900.00 is a difference in shape, not in arithmetic.
+   4. The breakdown drawn, not just listed. Each allowance carries a bar of its
+      share of the total.
+   5. Every state a pointer or a keyboard can reach says so: hover, press, and
+      a focus ring that is the row rather than a rectangle somewhere near it. */
+
+.budget-item {
+    /* Pulled out to the card's own edge so a row's wash and its rule reach the
+       sides. Inset backgrounds floating in a gutter read as a mistake. */
+    margin: 0 -0.75rem;
+    padding: 0 0.75rem;
+    border-bottom: 1px solid var(--border);
+    transition: background-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.budget-table > .budget-item:last-child { border-bottom: none; }
+
+/* Technique 2: state as colour and edge. The wash is faint enough to read as
+   paper rather than as a highlighter, and the edge does the pointing. */
+.budget-item.is-chosen {
+    background: var(--blue-50);
+    box-shadow: inset 3px 0 0 var(--blue-600);
+}
+
+.budget-item.is-locked {
+    background: var(--success-bg);
+    box-shadow: inset 3px 0 0 var(--success);
+}
+
+/* Technique 5: hover only where hovering means something. A touch screen keeps
+   the last-tapped row lit otherwise, which reads as a selection nobody made. */
+@media (hover: hover) {
+    .budget-item:hover { background: var(--surface-alt); }
+    .budget-item.is-chosen:hover { background: var(--blue-50); }
+    .budget-item.is-locked:hover { background: var(--success-bg); }
+}
 
 .budget-row {
     display: flex;
@@ -1559,14 +1604,25 @@ a.check-row-title:hover { color: var(--blue-600); }
     align-items: center;
     gap: 0.5rem;
     min-width: 0;
-    padding: 0.6rem 0;
+    padding: 0.7rem 0;
     border: 0;
-    border-radius: 0;
+    border-radius: var(--radius-sm);
     background: transparent;
     color: inherit;
     font-weight: 400;
     text-align: left;
 }
+
+/* The ring goes round the row, not round the text inside it: a focus ring that
+   traces something narrower than the thing being operated is a puzzle. */
+.budget-row-head:focus-visible {
+    outline: 2px solid var(--blue-600);
+    outline-offset: -2px;
+}
+
+.budget-row-head:active .group-caret { transform: scale(0.9); }
+
+.budget-row-head:active .group-caret.open { transform: rotate(90deg) scale(0.9); }
 
 .budget-row-main { flex: 1; min-width: 0; }
 
@@ -1579,7 +1635,14 @@ a.check-row-title:hover { color: var(--blue-600); }
 
 .budget-row-sub { display: block; margin-top: 0.15rem; }
 
-.budget-row-head .cat-figures { flex: none; }
+/* Technique 3: the totals column. Tabular figures so the digits sit in the same
+   places on every row, and a size that makes the total the second thing read
+   after the name. */
+.budget-row-total {
+    flex: none;
+    font-size: 0.95rem;
+    font-weight: 650;
+}
 
 .budget-row-action {
     flex: none;
@@ -1590,14 +1653,131 @@ a.check-row-title:hover { color: var(--blue-600); }
    totals stay in a column instead of stepping in and out by its width. Not on a
    phone: there the column is too narrow to spend on a gap. */
 @media (min-width: 640px) {
-    .budget-row-action { min-width: 9rem; }
+    .budget-row-action { min-width: 9.5rem; }
 }
 
 /* Indented past the caret, so the breakdown reads as belonging to the row above
    it rather than as the next row down. */
-.budget-detail { padding: 0 0 0.6rem 1.5rem; }
+.budget-detail {
+    padding: 0.1rem 0 0.75rem 1.5rem;
+    /* No fill mode: the panel is created at the moment it is wanted, so it has
+       no "before" to hold, and a fill that outlasts a paused animation would
+       leave the breakdown invisible rather than merely unanimated. */
+    animation: budget-detail-in 0.18s ease;
+}
 
-.budget-line { padding: 0.15rem 0; }
+/* Technique 1, made visible. The panel arrives from under its own row rather
+   than appearing fully formed, which is what tells the reader where it came
+   from when it is the third row of five that opened. */
+@keyframes budget-detail-in {
+    from { opacity: 0; transform: translateY(-0.35rem); }
+    to { opacity: 1; transform: none; }
+}
+
+/* Technique 4: each allowance drawn against the budget it belongs to. */
+.budget-line { padding: 0.3rem 0; }
+
+.budget-line-bar {
+    height: 4px;
+    margin-top: 0.25rem;
+    background: var(--surface-alt);
+}
+
+.budget-item.is-locked .budget-line-bar .progress-fill { background: var(--success); }
+
+/* Slack is not an allowance anybody chose, so its bar is drawn as the absence
+   of one rather than as another category competing for width. */
+.budget-line.is-slack .budget-line-bar .progress-fill {
+    background: repeating-linear-gradient(
+        135deg,
+        var(--text-faint) 0 3px,
+        transparent 3px 6px);
+}
+
+/* Technique 5 again, on the controls. Pills with a hairline read as a set of
+   related choices; a row of bare blue words reads as prose that happens to be
+   clickable, and on a phone gives nothing to aim at. */
+.budget-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-top: 0.7rem;
+}
+
+.budget-action {
+    display: inline-flex;
+    align-items: center;
+    min-height: 34px;
+    padding: 0.35rem 0.75rem;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: var(--surface);
+    color: var(--text-dim);
+    font-size: 0.8rem;
+    font-weight: 620;
+    transition: border-color 0.15s ease, color 0.15s ease, background-color 0.15s ease;
+}
+
+@media (hover: hover) {
+    .budget-action:hover {
+        border-color: var(--blue-600);
+        color: var(--blue-600);
+    }
+}
+
+.budget-action:active { transform: translateY(1px); }
+
+.budget-action:focus-visible {
+    outline: 2px solid var(--blue-600);
+    outline-offset: 2px;
+}
+
+/* One filled control per group. More than one and the eye has to choose which
+   emphasis to believe. */
+.budget-action.is-primary {
+    border-color: var(--blue-600);
+    background: var(--blue-600);
+    color: #fff;
+}
+
+@media (hover: hover) {
+    .budget-action.is-primary:hover {
+        border-color: var(--blue-700);
+        background: var(--blue-700);
+        color: #fff;
+    }
+}
+
+.budget-action.is-choose { color: var(--blue-600); }
+
+/* A thumb needs a target, not a word. The shell is sized for one throughout;
+   these are the controls that were not. */
+@media (pointer: coarse) {
+    .budget-action {
+        min-height: 44px;
+        padding-left: 0.95rem;
+        padding-right: 0.95rem;
+    }
+}
+
+/* Only on the confirming press. A Delete that is red before it is armed spends
+   its warning on the press that does nothing. */
+.budget-action.is-danger {
+    border-color: var(--danger);
+    background: var(--danger-bg);
+    color: var(--danger);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .budget-item,
+    .budget-action { transition: none; }
+
+    .budget-detail { animation: none; }
+
+    .budget-action:active,
+    .budget-row-head:active .group-caret,
+    .budget-row-head:active .group-caret.open { transform: none; }
+}
 
 /* A count on a tab, for history entries still standing. */
 .tab-count {
