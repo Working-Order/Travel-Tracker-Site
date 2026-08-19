@@ -2064,29 +2064,77 @@ a.check-row-title:hover { color: var(--blue-600); }
     -webkit-overflow-scrolling: touch;
 }
 
-.chat-intro { margin-bottom: 0.85rem; }
+/* The empty thread's welcome, centred in the space the messages will fill:
+   margin-block auto floats it to the middle while it is alone, and the first
+   answer replaces it entirely. */
+.chat-intro {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-block: auto;
+    padding: 1.5rem 0.5rem 2rem;
+    text-align: center;
+}
+
+.chat-intro-spark {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    margin-bottom: 0.7rem;
+    border-radius: 50%;
+    background: var(--blue-50);
+    color: var(--blue-600);
+}
+
+.chat-intro-spark svg {
+    width: 22px;
+    height: 22px;
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 1.6;
+    stroke-linejoin: round;
+}
+
+.chat-intro h2 { margin-bottom: 0.35rem; }
+
+.chat-intro p {
+    max-width: 30rem;
+    margin-bottom: 0.9rem;
+}
+
+.chat-intro .chip-row { justify-content: center; }
 
 .chat-footnote {
     padding-bottom: calc(var(--safe-bottom) + 0.6rem);
-    margin-top: -0.35rem;
+    margin-top: 0.4rem;
 }
 
 .msg {
     max-width: 85%;
     margin-bottom: 0.75rem;
-    padding: 0.7rem 0.85rem;
+    padding: 0.7rem 0.9rem;
     border: 1px solid var(--border);
-    border-radius: var(--radius);
+    border-radius: 18px;
     background: var(--surface);
 }
 
+/* The traveller's turns wear the accent and sit to the right; the assistant's
+   stay quiet on the left. Each keeps one tight corner pointing at its speaker,
+   the grammar every messaging app has taught. */
 .msg-user {
     align-self: flex-end;
     border-color: transparent;
-    background: var(--blue-50);
+    border-bottom-right-radius: 6px;
+    background: var(--blue-600);
+    color: #fff;
 }
 
-.msg-bot { align-self: flex-start; }
+.msg-bot {
+    align-self: flex-start;
+    border-bottom-left-radius: 6px;
+}
 
 .msg-meta {
     display: flex;
@@ -2096,6 +2144,9 @@ a.check-row-title:hover { color: var(--blue-600); }
     font-size: 0.72rem;
     font-weight: 600;
 }
+
+/* Legible on the accent, without shouting over the message itself. */
+.msg-user .msg-meta { color: rgba(255, 255, 255, 0.78); }
 
 /* Answers arrive with their own line breaks, and a paragraph the model meant as
    two is not one. Long place names and URLs wrap rather than widen the panel. */
@@ -2110,38 +2161,73 @@ a.check-row-title:hover { color: var(--blue-600); }
     border-top: 1px solid var(--border);
 }
 
+/* One rounded field holding the textarea and the send control together, the
+   shape every current chat app has settled on, instead of a bare box and a
+   labelled button sitting apart above a rule. */
 .composer {
     display: flex;
     align-items: flex-end;
-    gap: 0.5rem;
-    padding: 0.6rem 0 0.5rem;
-    border-top: 1px solid var(--border);
-    background: var(--bg);
+    gap: 0.45rem;
+    margin-top: 0.4rem;
+    padding: 0.35rem 0.35rem 0.35rem 0.6rem;
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    background: var(--surface);
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.composer:focus-within {
+    border-color: var(--blue-600);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
 }
 
 .composer textarea {
     flex: 1;
     min-width: 0;
     margin: 0;
-    /* One line to start, matching the Send button beside it, and up to five
+    /* One line to start, matching the send control beside it, and up to five
        before it scrolls. A two-line box that is empty most of the time steals
        the height from the conversation above it. */
-    height: 2.6rem;
-    min-height: 2.6rem;
+    height: 2.3rem;
+    min-height: 2.3rem;
     max-height: 8rem;
-    padding-top: 0.55rem;
-    padding-bottom: 0.55rem;
+    padding: 0.5rem 0.35rem;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
     resize: none;
     overflow-y: auto;
 }
 
-.composer button {
-    height: 2.6rem;
-    padding-top: 0;
-    padding-bottom: 0;
+/* The container carries the focus ring, so the field inside must not add its
+   own on top of it. */
+.composer textarea:focus { outline: none; }
+
+.composer-send {
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    width: 2.3rem;
+    height: 2.3rem;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: var(--blue-600);
+    color: #fff;
 }
 
-.composer button { flex: none; }
+.composer-send svg {
+    width: 17px;
+    height: 17px;
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 2.2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.composer-send:disabled { opacity: 0.4; }
 
 @media (min-width: 1024px) {
     /* Docked, not full screen: the point of the bubble is that the trip stays
@@ -2211,12 +2297,25 @@ a.check-row-title:hover { color: var(--blue-600); }
     padding-bottom: calc(var(--nav-height) + var(--safe-bottom) + 0.6rem);
 }
 
+/* The column holding the segmented switch and whichever view it chose. On a
+   phone it is the whole page; on desktop it is the pane beside the sidebar. */
+.chat-main {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    min-width: 0;
+    min-height: 0;
+}
+
 /* The shell already pads the page, so the chat gives up the panel padding it
    carries for the bubble... */
 .chat-page .chat { padding: 0; }
 
 /* ...and the safe-area padding the panel needed at the true bottom edge. */
-.chat-page .chat-footnote { padding-bottom: 0.1rem; }
+.chat-page .chat-footnote {
+    padding-bottom: 0.1rem;
+    text-align: center;
+}
 
 .chat-page .tools { padding: 0.15rem 0 0.75rem; }
 
@@ -2330,14 +2429,198 @@ a.check-row-title:hover { color: var(--blue-600); }
 
 .chat-list-foot { margin-top: 0.6rem; }
 
+/* --- The desktop chat workspace --------------------------------------------
+   Above 1024px the page stops being a phone screen with room to spare and
+   becomes the two-pane shape a window that wide expects of a chat: every
+   conversation in a rail on the left, the open thread filling the rest, and
+   the segmented switch gone because the rail is the switch. The thread, the
+   composer and the tools all keep to one reading measure, centred in the
+   pane, so the width serves the conversation instead of stranding it. */
+
+.chat-side { display: none; }
+
 @media (min-width: 1024px) {
-    /* A chat line the width of the whole content column cannot be tracked back
-       to its start; the page keeps to a conversation's width instead. */
+    /* Full bleed, unlike the document pages: a workspace boxed to the reading
+       column reads as a strip with dead margins, so the rail takes the window's
+       left edge and only the thread inside keeps to a measure. The header's
+       row unclamps with it, so the title sits over the rail rather than
+       indented to a column the page below no longer keeps. */
     .chat-page {
-        max-width: 860px;
-        padding-bottom: 1.5rem;
+        display: grid;
+        grid-template-columns: 300px minmax(0, 1fr);
+        column-gap: 2.25rem;
+        max-width: none;
+        padding-bottom: 1.25rem;
+    }
+
+    .shell-main:has(.chat-page) .shell-header-row,
+    .shell-main:has(.chat-page) .shell-subtitle {
+        max-width: none;
+    }
+
+    .chat-page .seg { display: none; }
+
+    /* The lane is the pane: the traveller's turns anchor to the right edge and
+       the assistant's to the left, which is what fills a wide thread with
+       conversation instead of margins. Only the single bubble keeps a cap, so
+       one long answer never becomes a line nobody can track back. */
+    .chat-page .msg { max-width: min(92%, 46rem); }
+
+    .chat-page .chat-intro h2 { font-size: 1.35rem; }
+
+    .chat-side {
+        display: flex;
+        flex-direction: column;
+        min-height: 0;
+        padding-right: 1.5rem;
+        border-right: 1px solid var(--border);
+    }
+
+    .chat-side-head {
+        display: flex;
+        flex: none;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0.15rem 0.6rem 0.6rem;
+    }
+
+    .chat-side-label {
+        color: var(--text-faint);
+        font-size: 0.68rem;
+        font-weight: 750;
+        letter-spacing: 0.09em;
+        text-transform: uppercase;
+    }
+
+    .chat-side-list {
+        display: flex;
+        flex: 1;
+        flex-direction: column;
+        gap: 2px;
+        min-height: 0;
+        overflow-y: auto;
+    }
+
+    .chat-side-row {
+        display: flex;
+        flex: none;
+        align-items: center;
+        border-radius: var(--radius-sm);
+    }
+
+    .chat-side-row:hover { background: var(--surface-alt); }
+
+    /* A tint plus a hairline, because in the dark theme the tint alone sits
+       too close to the hover fill to read as "open". */
+    .chat-side-row.active {
+        background: var(--blue-50);
+        box-shadow: inset 0 0 0 1px rgba(37, 99, 235, 0.35);
+    }
+
+    .chat-side-main {
+        display: flex;
+        flex: 1;
+        flex-direction: column;
+        gap: 0.12rem;
+        min-width: 0;
+        padding: 0.55rem 0.6rem;
+        border: 0;
+        border-radius: inherit;
+        background: transparent;
+        color: inherit;
+        font-weight: 400;
+        text-align: left;
+    }
+
+    .chat-side-name {
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+        min-width: 0;
+        font-size: 0.88rem;
+        font-weight: 650;
+    }
+
+    .chat-side-name .truncate { min-width: 0; }
+
+    /* Delete waits for the pointer to arrive, so the rail reads as names
+       rather than as a column of bins. Red only once armed, as in the list. */
+    .chat-side-delete {
+        display: inline-flex;
+        flex: none;
+        align-items: center;
+        margin-right: 0.3rem;
+        padding: 0.3rem;
+        border: 0;
+        background: transparent;
+        color: var(--text-faint);
+        opacity: 0;
+    }
+
+    .chat-side-row:hover .chat-side-delete,
+    .chat-side-delete:focus-visible,
+    .chat-side-delete.confirm { opacity: 1; }
+
+    .chat-side-delete:hover,
+    .chat-side-delete.confirm { color: var(--danger); }
+
+    .chat-side-delete.confirm {
+        font-size: 0.72rem;
+        font-weight: 700;
+        white-space: nowrap;
+    }
+
+    .chat-side-delete svg {
+        width: 15px;
+        height: 15px;
+        stroke: currentColor;
+        fill: none;
+        stroke-width: 1.8;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+    }
+
+    /* The assistant's jobs, pinned under the rail as the one entry that is
+       not a conversation, wearing the same spark the job rows carry. */
+    .chat-side-tools {
+        display: flex;
+        flex: none;
+        align-items: center;
+        gap: 0.55rem;
+        margin-top: 0.7rem;
+        padding: 0.6rem 0.65rem;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        background: var(--surface);
+        text-align: left;
+    }
+
+    .chat-side-tools:hover { background: var(--surface-alt); }
+
+    .chat-side-tools.active {
+        border-color: var(--blue-600);
+        background: var(--blue-50);
+    }
+
+    .chat-side-tools-text {
+        display: flex;
+        flex-direction: column;
+        gap: 0.1rem;
+        min-width: 0;
+    }
+
+    .chat-side-tools-title {
+        font-size: 0.85rem;
+        font-weight: 650;
+    }
+
+    .chat-side-foot {
+        flex: none;
+        margin-top: 0.55rem;
+        padding: 0 0.5rem;
     }
 }
+
 
 /* --- Radial menu -----------------------------------------------------------
    The floating actions, gathered onto an arc around one anchor in the corner
