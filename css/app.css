@@ -69,6 +69,40 @@ input, select, textarea, button {
     font-size: 16px;
 }
 
+/* --- Scrollbars ------------------------------------------------------------
+   The platform default is a full-width grey machine part with arrow buttons on
+   either end, which no dark surface survives. Every scroller in the app gets a
+   slim rounded thumb on an invisible track instead: the standard properties
+   where the engine honours them, the -webkit ones where it does not. */
+
+:root {
+    scrollbar-color: var(--border) transparent;
+}
+
+* {
+    scrollbar-width: thin;
+}
+
+::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    border: 3px solid transparent;
+    border-radius: 999px;
+    background-color: var(--border);
+    background-clip: padding-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background-color: var(--text-faint);
+}
+
 h1, h2, h3 {
     margin: 0;
     line-height: 1.25;
@@ -2289,6 +2323,12 @@ a.check-row-title:hover { color: var(--blue-600); }
 /* Nothing scrolls past the header here, so it has nothing to stick to. */
 .shell-main:has(.chat-page) .shell-header { position: static; }
 
+/* The corner belongs to the composer here. Everything the dock floats on this
+   page -- a new chat, the assistant's add-this add-that -- already lives in
+   the header button and the Do something view, and its anchor was landing on
+   the send control. */
+.shell:has(.chat-page) .rad-dock { display: none; }
+
 .chat-page {
     display: flex;
     flex-direction: column;
@@ -2465,6 +2505,10 @@ a.check-row-title:hover { color: var(--blue-600); }
        conversation instead of margins. Only the single bubble keeps a cap, so
        one long answer never becomes a line nobody can track back. */
     .chat-page .msg { max-width: min(92%, 46rem); }
+
+    /* Room between the bubbles' right edge and the scrollbar thumb, so the
+       traveller's turns hug the lane rather than the machinery. */
+    .chat-page .chat-scroll { padding-right: 0.75rem; }
 
     .chat-page .chat-intro h2 { font-size: 1.35rem; }
 
